@@ -1,8 +1,8 @@
 #include "Engine.h"
-#include <iostream>
+#include "log.h"
 
 Engine::Engine(Game& game) {
-	std::cerr << "Engine is created for the game\n";
+	LOG(TRACE) << "Engine is created for the game\n";
 }
 
 void Engine::Load() {
@@ -15,5 +15,5 @@ void Engine::Shutdown() {
 }
 
 Engine::~Engine() {
-	std::cerr << "Engine is destroyed\n";
+	LOG(TRACE) << "Engine is destroyed\n";
 }

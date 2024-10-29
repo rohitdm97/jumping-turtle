@@ -1,10 +1,10 @@
 #include "Game.h"
-#include <iostream>
+#include "log.h"
 
 Game::Game() {
-	std::cerr << "Game is created\n";
+	LOG(TRACE) << "Game is created\n";
 }
 
 Game::~Game() {
-	std::cerr << "Game is destroyed\n";
+	LOG(TRACE) << "Game is destroyed\n";
 }
