@@ -2,11 +2,13 @@
 
 #include <map>
 
+
+
 namespace util {
     namespace logging {
 
-        Level _global_level_ = INFO;
-        std::map<Level, Logger*> _loggers_;
+        extern Level _global_level_;
+        extern std::map<Level, Logger*> _loggers_;
 
         std::ostream& operator<<(std::ostream& os, Level l) {
             switch (l) {
@@ -39,7 +41,7 @@ namespace util {
         }
 
         bool Logger::isActive() {
-            return _global_level_ >= this->level;
+            return _global_level_ <= this->level;
         }
 
         Logger::Logger(Level level) {
@@ -54,11 +56,27 @@ namespace util {
             return *this;
         }
 
-        Logger& Logger::operator<<(Level level) {
+        Logger& Logger::operator<<(float f) {
             if (!isActive()) {
                 return *this;
             }
-            std::cerr << level;
+            std::cerr << f;
+            return *this;
+        }
+
+        Logger& Logger::operator<<(double d) {
+            if (!isActive()) {
+                return *this;
+            }
+            std::cerr << d;
+            return *this;
+        }
+
+        Logger& Logger::operator<<(Level l) {
+            if (!isActive()) {
+                return *this;
+            }
+            std::cerr << l;
             return *this;
         }
 
@@ -86,12 +104,13 @@ namespace util {
             return *this;
         }
 
-        //Logger& Logger::operator<<(std::string& str) {
-        //    if (!isActive()) {
-        //        return *this;
-        //    }
-        //    std::cerr << str;
-        //    return *this;
-        //}
+        Logger& Logger::operator<<(std::string str) {
+            if (!isActive()) {
+                return *this;
+            }
+            std::cerr << str;
+            return *this;
+        }
+
     }
 }

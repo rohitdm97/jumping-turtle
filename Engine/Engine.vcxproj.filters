@@ -16,6 +16,36 @@
     <Filter Include="Header Files\log">
       <UniqueIdentifier>{5d0be4be-faeb-460d-8aec-da7271740cc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\scene">
+      <UniqueIdentifier>{30b9fe10-4b9e-4fbc-8fa9-e8f1033e14e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\render">
+      <UniqueIdentifier>{452873cb-a1a4-4f22-b6be-08e5aff0fc4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\entities">
+      <UniqueIdentifier>{92882836-e527-401e-a1d9-9dbdf000fb65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine">
+      <UniqueIdentifier>{f60a0bc2-a6b4-4996-89e9-51059ecf9523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\comp">
+      <UniqueIdentifier>{31ae96e9-ac79-4a38-b3a8-5aa288fa5237}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{3576aeab-f69f-4d98-844f-b2ba8a5e135f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\loader">
+      <UniqueIdentifier>{1a951fad-77a1-438b-b0b6-17de9430cbb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\assets">
+      <UniqueIdentifier>{46eb00da-055e-4bbe-98c9-76bd25aa4b50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\simple">
+      <UniqueIdentifier>{ddf74b48-b723-43db-8a9a-28c6427ca510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\camera">
+      <UniqueIdentifier>{45b88d30-c03e-4e2a-94b6-e86b34bf7b43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine.cpp">
@@ -27,16 +57,110 @@
     <ClCompile Include="src\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\KeyMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoPlaneGame\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WindowCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\log.h">
       <Filter>Header Files\log</Filter>
     </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>Header Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Header Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Header Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameLoop.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\KeyMap.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files\comp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\simple.fs">
+      <Filter>Resource Files\shaders\simple</Filter>
+    </None>
+    <None Include="shaders\simple.vs">
+      <Filter>Resource Files\shaders\simple</Filter>
+    </None>
+    <None Include="shaders\camera.vs">
+      <Filter>Resource Files\shaders\camera</Filter>
+    </None>
+    <None Include="shaders\camera.fs">
+      <Filter>Resource Files\shaders\camera</Filter>
+    </None>
+    <None Include="src\movements.enums">
+      <Filter>Header Files\engine</Filter>
+    </None>
+    <None Include="src\actions.enums">
+      <Filter>Header Files\engine</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\lib\assimp-vc143-mt.dll">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

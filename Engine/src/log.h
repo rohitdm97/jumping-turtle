@@ -21,10 +21,13 @@ namespace util {
 		public:
 			Logger(Level);
 			Logger& operator<<(int);
+			Logger& operator<<(float);
+			Logger& operator<<(double);
 			Logger& operator<<(Level);
 			Logger& operator<<(char);
 			Logger& operator<<(bool);
 			Logger& operator<<(const char*);
+			Logger& operator<<(std::string);
 		};
 
 		Logger& _logging_maps_(Level level, const char* file, int line);
@@ -34,10 +37,14 @@ namespace util {
 #include <string.h>
 #ifdef _WIN32
 #define LIMITER_CHAR '\\'
+#define DELIMITER_CHAR '\\'
+#define DELIMITER_STR "\\"
 #else
 #define LIMITER_CHAR '/'
+#define DELIMITER_CHAR '/'
+#define DELIMITER_STR "/"
 #endif // _WIN32
 
-#define __FILENAME__ (strrchr(__FILE__, LIMITER_CHAR) ? strrchr(__FILE__, LIMITER_CHAR) + 1 : __FILE__)
+#define __FILENAME__ (strrchr(__FILE__, DELIMITER_CHAR) ? strrchr(__FILE__, DELIMITER_CHAR) + 1 : __FILE__)
 
 #define LOG(level) util::logging::_logging_maps_(util::logging::Level::level, __FILENAME__, __LINE__)
