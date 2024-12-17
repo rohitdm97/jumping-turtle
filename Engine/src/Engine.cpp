@@ -30,24 +30,19 @@ namespace engine {
 	}
 
 	void Engine::Load() {
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			LOG(ERROR) << "Failed to initialize GLAD\n";
-			throw std::runtime_error("failed to initialize GLAD");
-		}
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			LOG(ERROR) << "Failed to initialize GLAD\n";
-			throw std::runtime_error("failed to initialize GLAD");
-		}
-
 		this->window = std::make_unique<render::Window>(this, 800, 600, "this is title");
-		// glad is loaded now
-		GCE
+		GCE;
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
+		glEnable(GL_DEPTH_TEST);
+		GCE;
 
 		shader = render::ShaderLoader("camera").Create();
-		//comp::Mesh mesh = comp::MeshLoader().Load("..\\assets\\porsche-911-930-turbo-1975", "source\\Sketchfab_2020_07_11_17_10_28.blend");
-		auto mesh = comp::createMesh();
-		model = std::make_unique<comp::Model>(mesh);
-		model->Attach(shader);
+		//this-> model = comp::ModelLoader().Load("..\\assets\\porsche_911_930_turbo_1975", "scene.gltf");
+		this->model = comp::createModel();
+		model.Attach(shader);
 		camera.SetPosition(glm::vec3(0.0f, 0.0f, +3.0f));
 		// load scenes
 		// load shaders
@@ -67,26 +62,23 @@ namespace engine {
 		return *window;
 	}
 
-	comp::Model& Engine::Model() const {
-		return *model;
-	}
-
 	void Engine::ProcessInput(Action a) {
+		const double delta = 1.0 / 60.0;
 		switch (a) {
 		case engine::EXIT:
 			glfwSetWindowShouldClose(Window().Ref(), true);
 			break;
 		case engine::MOVE_FORWARD:
-			camera.ProcessKeyboard(camera::FORWARD, 0.1f);
+			camera.ProcessKeyboard(camera::FORWARD, delta);
 			break;
 		case engine::MOVE_LEFT:
-			camera.ProcessKeyboard(camera::LEFT, 0.1f);
+			camera.ProcessKeyboard(camera::LEFT, delta);
 			break;
 		case engine::MOVE_BACKWARD:
-			camera.ProcessKeyboard(camera::BACKWARD, 0.1f);
+			camera.ProcessKeyboard(camera::BACKWARD, delta);
 			break;
 		case engine::MOVE_RIGHT:
-			camera.ProcessKeyboard(camera::RIGHT, 0.1f);
+			camera.ProcessKeyboard(camera::RIGHT, delta);
 			break;
 		case engine::MOVE_UP:
 			break;
@@ -111,7 +103,7 @@ namespace engine {
 		shader.Activate();
 		shader.SetMat4("CameraView", camera.GetViewMatrix());
 		shader.SetMat4("CameraProjection", camera.GetProjectionMatrix(window->AspectRatio()));
-		Model().Render(shader);
+		model.Render(shader);
 
 		GCE
 	}
@@ -119,8 +111,8 @@ namespace engine {
 	void Engine::Mouse_callback(double xpos, double ypos) {
 		if (firstMouseEvent) {
 			firstMouseEvent = false;
-			lastX = xpos;
-			lastY = ypos;
+			lastX = (int) xpos;
+			lastY = (int) ypos;
 		}
 		LOG(TRACE) << "cursor was moved x = " << xpos << " y = " << ypos << "\n";
 		double dx = xpos - lastX;

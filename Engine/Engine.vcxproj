@@ -54,6 +54,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\rohit\OneDrive\Documents\Github\JumpingTurtle\Engine\src;C:\Users\rohit\OneDrive\Documents\Github\JumpingTurtle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -71,6 +72,8 @@
       <ConformanceMode>true</ConformanceMode>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>C:\Users\rohit\OneDrive\Documents\Github\JumpingTurtle\Engine\src;C:\Users\rohit\OneDrive\Documents\Github\JumpingTurtle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,6 +114,7 @@
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\types.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>

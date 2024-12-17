@@ -37,7 +37,7 @@ namespace engine {
 		glm::mat4 GetViewMatrix();
 		glm::mat4 GetProjectionMatrix(float);
 
-		void ProcessKeyboard(camera::Movement dir, float delta);
+		void ProcessKeyboard(camera::Movement dir, double delta);
 		void ProcessMouseMovement(float xoffset, float yoffset, bool constraintPitch = true);
 		void ProcessMouseScroll(float yoffset);
 	};

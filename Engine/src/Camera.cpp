@@ -11,17 +11,28 @@ const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
-namespace engine {
-	namespace camera {
-		std::ostream& operator<<(std::ostream& os, Movement m) {
-			switch (m) {
-#define X(a) case a: os << #a; return os;
+util::logging::Logger& operator<<(util::logging::Logger& os, engine::camera::Movement m) {
+	switch (m) {
+#define X(a) case engine::camera::a: os << #a; return os;
 #include "movements.enums"
 #undef X
-			default:
-				throw new std::invalid_argument("Unknown enum Movement " + std::to_string(m));
-			}
-		}
+	default:
+		throw new std::invalid_argument("Unknown enum Movement " + std::to_string(m));
+	}
+}
+
+std::ostream& operator<<(std::ostream& os, engine::camera::Movement m) {
+	switch (m) {
+#define X(a) case engine::camera::a: os << #a; return os;
+#include "movements.enums"
+#undef X
+	default:
+		throw new std::invalid_argument("Unknown enum Movement " + std::to_string(m));
+	}
+}
+
+namespace engine {
+	namespace camera {
 	}
 
 	void Camera::updateCameraVectors() {
@@ -61,8 +72,9 @@ namespace engine {
 		return glm::perspective(glm::radians(Zoom), aspectRatio, 0.1f, 100.0f);
 	}
 
-	void Camera::ProcessKeyboard(camera::Movement dir, float delta) {
-		float dx = Speed * delta;
+	void Camera::ProcessKeyboard(camera::Movement dir, double delta) {
+		LOG(TRACE) << "Processing Keyboard event " << dir << "\n"; 
+		float dx = Speed * (float) delta;
 		switch (dir) {
 		case engine::camera::FORWARD:
 			Position += Front * dx;

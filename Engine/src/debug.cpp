@@ -6,6 +6,13 @@
 
 std::string lookup(int val) {
 	switch (val) {
+	case 0x1903: return "GL_RED";
+	case 0x1904: return "GL_GREEN";
+	case 0x1905: return "GL_BLUE";
+	case 0x1906: return "GL_ALPHA";
+	case 0x1907: return "GL_RGB";
+	case 0x1908: return "GL_RGBA";
+
 	case 32: return "GLFW_KEY_SPACE";
 	case 39: return "GLFW_KEY_APOSTROPHE";
 	case 44: return "GLFW_KEY_COMMA";

@@ -11,7 +11,7 @@
 
 namespace util {
 	namespace logging {
-		Level _global_level_ = ALL;
+		Level _global_level_ = DEBUG;
 		std::map<Level, Logger*> _loggers_;
 	}
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include <glad/ 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 
@@ -16,7 +15,6 @@ namespace render {
 		int height;
 		int xpos;
 		int ypos;
-		GladGLContext context;
 		GLFWwindow* ref;
 		engine::Engine& engine;
 	public:

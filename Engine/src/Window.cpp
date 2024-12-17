@@ -57,6 +57,9 @@ void glDebugOutputCallback(
 namespace render {
 	void Window::Framebuffer_size_callback(int width, int height) {
 		LOG(TRACE) << "Framebuffer_size_callback was called " << width << " " << height << "\n";
+		glViewport(0, 0, width, height);
+		this->width = width;
+		this->height = height;
 	}
 
 	void Window::Window_size_callback(int width, int height) {
@@ -80,6 +83,15 @@ namespace render {
 		}
 		glfwMakeContextCurrent(ref);
 		glfwSetWindowUserPointer(ref, engine);
+
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+			LOG(ERROR) << "Failed to initialize GLAD\n";
+			throw std::runtime_error("failed to initialize GLAD");
+		}
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+			LOG(ERROR) << "Failed to initialize GLAD\n";
+			throw std::runtime_error("failed to initialize GLAD");
+		}
 
 		int contextFlags = 0;
 		glGetIntegerv(GL_CONTEXT_FLAGS, &contextFlags);

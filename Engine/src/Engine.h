@@ -23,14 +23,13 @@ namespace engine {
 		GameLoop loop;
 		KeyMap keyMap;
 		render::Shader shader;
-		ModelPtr model;
+		comp::Model model;
 		Camera camera;
 	public:
 		Engine(Game& game);
 
 		KeyMap& KeyMap();
 		render::Window& Window() const;
-		comp::Model& Model() const;
 
 		bool LoadGLAD();
 		void Load();

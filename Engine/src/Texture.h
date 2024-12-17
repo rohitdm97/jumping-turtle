@@ -20,6 +20,6 @@ namespace render {
 
 	class TextureLoader {
 	public:
-		Texture Load(std::string& filepath);
+		Texture Load(const std::string& filepath);
 	};
 }
