@@ -1,5 +1,6 @@
 #pragma once
 
+#include "log.h"
 #include <iostream>
 
 #include <glm/glm.hpp>
@@ -12,21 +13,22 @@ namespace engine {
 #undef X
 		};
 
+		// todo does this even work?
 		std::ostream& operator<<(std::ostream& os, Movement m);
 	}
 	class Camera {
 	private:
-		glm::vec3 Position;
-		glm::vec3 Front;
-		glm::vec3 Up;
-		glm::vec3 Right;
-		glm::vec3 WorldUp;
+		glm::vec3 position;
+		glm::vec3 front;
+		glm::vec3 up;
+		glm::vec3 right;
+		glm::vec3 worldUp;
 
-		float Yaw;
-		float Pitch;
-		float Speed;
-		float MouseSensitivity;
-		float Zoom;
+		float yaw;
+		float pitch;
+		float speed;
+		float mouseSensitivity;
+		float zoom;
 
 		void updateCameraVectors();
 	public:
@@ -34,11 +36,15 @@ namespace engine {
 		Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch);
 		void SetPosition(glm::vec3 position);
 
-		glm::mat4 GetViewMatrix();
-		glm::mat4 GetProjectionMatrix(float);
+		const glm::vec3& Position() const;
+		glm::mat4 GetViewMatrix() const;
+		glm::mat4 GetProjectionMatrix(float) const;
 
 		void ProcessKeyboard(camera::Movement dir, double delta);
 		void ProcessMouseMovement(float xoffset, float yoffset, bool constraintPitch = true);
 		void ProcessMouseScroll(float yoffset);
+
+		// why does this even work? operator functions don't need namespace?
+		friend util::logging::Logger& operator<<(util::logging::Logger& os, const engine::Camera& c);
 	};
 }

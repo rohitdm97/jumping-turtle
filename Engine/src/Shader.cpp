@@ -1,4 +1,6 @@
 #include "Shader.h"
+#include "log.h"
+#include "types.h"
 
 #include <glad/glad.h>
 
@@ -9,7 +11,15 @@
 #include <sstream>
 #include <iostream>
 
-#include "log.h"
+
+#include "Camera.h"
+#include "Light.h"
+
+void assertForNotFound(bool found, bool allowUnknowns) {
+	if (!found) {
+		assert(allowUnknowns && "unknown condition must have allowUnknowns");
+	}
+}
 
 namespace render {
 	ShaderLoader::ShaderLoader(std::string shaderName) : shaderName(shaderName) {
@@ -80,53 +90,80 @@ namespace render {
 		return Shader(ID);
 	}
 
-	Shader::Shader(): ID_(0) {
+	Shader::Shader(): ID_(0), store(UniformStore(ID_)) {
 	}
 
-	Shader::Shader(unsigned int ID) : ID_(ID) {
+	Shader::Shader(unsigned int ID) : ID_(ID), store(UniformStore(ID)) {
 	}
 
-	void Shader::Activate() {
+	void Shader::Activate() const {
 		if (ID_) {
 			glUseProgram(ID_);
 		}
 	}
 
-	unsigned int Shader::getUniformLocation(const std::string& name) {
-		auto it = uniformLocationsCache.find(name);
-		if (it == uniformLocationsCache.end()) {
-			int location = glGetUniformLocation(ID_, name.c_str());
-			if (location == -1) {
-				throw std::invalid_argument("" + name + " is not found in the shader");
-			}
-			uniformLocationsCache[name] = location;
-			return location;
+	UniformStore Shader::Uniforms(bool allowUnknowns) {
+		if (allowUnknowns) {
+			return UniformStore(ID_, true);
 		}
-		return (*it).second;
+		return store;
 	}
 
-	void Shader::SetBool(const std::string& name, bool value) {
-		glUniform1i(getUniformLocation(name), (int) value);
+	void UniformStore::SetInt(const std::string& name, int value) {
+		const auto [found, location] = getUniformLocation(name);
+		assertForNotFound(found, allowUnknowns);
+		if (found) glUniform1i(location, value);
 	}
 
-	void Shader::SetInt(const std::string& name, int value) {
-		glUniform1i(getUniformLocation(name), value);
+	void UniformStore::SetVec3(const std::string& name, const glm::vec3& vec3) {
+		const auto [found, location] = getUniformLocation(name);
+		assertForNotFound(found, allowUnknowns);
+		if (found) glUniform3fv(location, 1, glm::value_ptr(vec3));
 	}
 
-	void Shader::SetFloat(const std::string& name, float value) {
-		glUniform1f(getUniformLocation(name), value);
+	void UniformStore::SetMat4(const std::string& name, glm::mat4 mat4) {
+		const auto [found, location] = getUniformLocation(name);
+		assertForNotFound(found, allowUnknowns);
+		if (found) glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat4));
 	}
 
-	void Shader::SetVec4(const std::string& name, float values[]) {
-		glUniform4f(getUniformLocation(name), values[0], values[1], values[2], values[3]);
+	void UniformStore::SetCamera(const std::string& name, const engine::Camera& camera, float aspectRatio) {
+		SetVec3(name + ".position", camera.Position());
+		SetMat4(name + ".view", camera.GetViewMatrix());
+		SetMat4(name + ".projection", camera.GetProjectionMatrix(aspectRatio));
 	}
 
-	void Shader::SetMat4(const std::string& name, glm::mat4 mat4) {
-		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(mat4));
+	void UniformStore::SetLight(const std::string& name, const render::Light& light) {
+		SetVec3(name + ".position", light.Position());
+		SetVec3(name + ".ambient", light.Color());
+		SetVec3(name + ".diffuse", light.Color());
+		SetVec3(name + ".specular", light.Color());
 	}
 
 	const unsigned int& Shader::ID() const {
 		return this->ID_;
+	}
+
+	std::tuple<bool, unsigned int> UniformStore::getUniformLocation(const std::string& name) {
+		auto it = uniformLocationsCache.find(name);
+		if (it == uniformLocationsCache.end()) {
+			int location = glGetUniformLocation(shaderID, name.c_str());
+			if (location == -1) {
+				if (allowUnknowns) {
+					return std::tuple(false, 0);
+				}
+				throw std::invalid_argument("" + name + " is not found in the shader");
+			}
+			uniformLocationsCache[name] = location;
+			return std::tuple(true, location);
+		}
+		return std::tuple(true, (*it).second);
+	}
+
+	UniformStore::UniformStore(const unsigned int shaderID) : shaderID(shaderID) {
+	}
+
+	UniformStore::UniformStore(const unsigned int shaderID, bool allowUnknowns) : shaderID(shaderID), allowUnknowns(allowUnknowns) {
 	}
 
 }

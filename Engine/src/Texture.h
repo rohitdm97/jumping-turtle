@@ -11,7 +11,7 @@ namespace render {
 		unsigned int ID_ = INVALID_ID;
 		int width, height, nrChannels;
 	public:
-		void Bind(unsigned int slot);
+		void Bind(unsigned int slot) const;
 
 		bool IsValid() const;
 

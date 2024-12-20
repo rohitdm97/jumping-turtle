@@ -12,7 +12,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "Shader.h"
-#include "Texture.h"
+#include "Material.h"
 
 inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from) {
 	glm::mat4 to;
@@ -25,28 +25,31 @@ inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from) {
 	return to;
 }
 
-glm::vec3 g_positions[] = {
-	glm::vec3(0.5f, -0.5f, 0.0f),  // bottom right
-	glm::vec3(-0.5f, -0.5f, 0.0f),  // bottom left
-	glm::vec3(0.0f,  0.5f, 0.0f),  // top 
-};
+namespace static_data {
+	namespace model {
+		glm::vec3 g_positions[] = {
+			glm::vec3(0.5f, -0.5f, 0.0f),  // bottom right
+			glm::vec3(-0.5f, -0.5f, 0.0f),  // bottom left
+			glm::vec3(0.0f,  0.5f, 0.0f),  // top 
+		};
 
-glm::vec3 g_normals[] = {
-	glm::vec3(0.0f,  0.0f, 1.0f),  // bottom right
-	glm::vec3(0.0f,  0.0f, 1.0f),  // bottom left
-	glm::vec3(0.0f,  0.0f, 1.0f),  // top 
-};
+		glm::vec3 g_normals[] = {
+			glm::vec3(0.0f,  0.0f, 1.0f),  // bottom right
+			glm::vec3(0.0f,  0.0f, 1.0f),  // bottom left
+			glm::vec3(0.0f,  0.0f, 1.0f),  // top 
+		};
 
-glm::vec2 g_texCoords[] = {
-	glm::vec2(0.0f,  0.0f),  // bottom right
-	glm::vec2(1.0f,  0.0f),  // bottom left
-	glm::vec2(0.5f,  1.0f),  // top 
-};
+		glm::vec2 g_texCoords[] = {
+			glm::vec2(0.0f,  0.0f),  // bottom right
+			glm::vec2(1.0f,  0.0f),  // bottom left
+			glm::vec2(0.5f,  1.0f),  // top 
+		};
 
-unsigned int g_indices[] = {
-	0, 1, 2,
-	0, 2, 1,
-};
+		unsigned int g_indices[] = {
+			0, 2, 1,
+		};
+	}
+}
 
 namespace comp {
 	Model createModel() {
@@ -54,31 +57,33 @@ namespace comp {
 		md.nodes.reserve(1);
 		md.meshes.reserve(1);
 
+		const auto vCount = 3;
+		const auto iCount = 3;
+
 		MeshData mesh0;
 		mesh0.materialIndex = 0;
-		mesh0.noOfIndices = 6;
+		mesh0.noOfIndices = iCount;
 		mesh0.baseVertex = 0;
 		mesh0.baseIndex = 0;
 		md.meshes.push_back(mesh0);
 
-		md.positions.reserve(3);
-		md.normals.reserve(3);
-		md.texCoords.reserve(3);
-		md.indices.reserve(6);
+		md.positions.reserve(vCount);
+		md.normals.reserve(vCount);
+		md.texCoords.reserve(vCount);
+		md.indices.reserve(iCount);
 
 		const aiVector3D Zero(0.0f, 0.0f, 0.0f);
-		for (unsigned int j = 0; j < 3; j++) {
-			md.positions.push_back(g_positions[j]);
-			md.normals.push_back(g_normals[j]);
-			md.texCoords.push_back(g_texCoords[j]);
+		for (unsigned int j = 0; j < vCount; j++) {
+			md.positions.push_back(static_data::model::g_positions[j]);
+			md.normals.push_back(static_data::model::g_normals[j]);
+			md.texCoords.push_back(static_data::model::g_texCoords[j]);
 		}
-		for (unsigned int j = 0; j < 6; j++) {
-			md.indices.push_back(g_indices[j]);
+		for (unsigned int j = 0; j < iCount; j++) {
+			md.indices.push_back(static_data::model::g_indices[j]);
 		}
 
-		render::TextureLoader tl;
-		const auto texFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "white_tile.png";
-		md.textures.push_back(tl.Load(texFile));
+		auto whileTile = render::material::whiteTile();
+		md.materials.push_back(whileTile);
 
 		NodeData node0;
 		node0.meshes.push_back(0);
@@ -101,20 +106,21 @@ void printNode(std::string prefix, aiNode* node) {
 	if (node->mMeshes != nullptr) {
 		std::cout << prefix << "meshe indices: \n";
 		std::cout << prefix << "[";
-		for (index i = 0; i < node->mNumMeshes; i++) {
+		for (index_t i = 0; i < node->mNumMeshes; i++) {
 			std::cout << node->mMeshes[i] << ", ";
 		}
 		std::cout << "]\n";
 	}
 	std::cout << prefix << "children count: " << node->mNumChildren << "\n";
-	for (index i = 0; i < node->mNumChildren; i++) {
+	for (index_t i = 0; i < node->mNumChildren; i++) {
 		printNode(prefix + "--", node->mChildren[i]);
 	}
 }
 
+
 namespace comp {
 	void Model::calculateMatrix() {
-		this->matrixCached = position * rotation * (scale * glm::mat4(1.0f));
+		this->matrixCached = position * rotation * glm::scale(glm::mat4(1.0f), glm::vec3(scale));
 	}
 
 	Model::Model(ModelData& md) {
@@ -166,7 +172,7 @@ namespace comp {
 		cleanUp();
 	}
 
-	Model::Model(Model&& o) {
+	Model::Model(Model&& o) noexcept {
 		this->md = std::move(o.md);
 
 		this->position = std::move(o.position);
@@ -185,7 +191,7 @@ namespace comp {
 		}
 	}
 
-	Model& Model::operator=(Model&& o) {
+	Model& Model::operator=(Model&& o) noexcept {
 		if (this != &o) {
 			this->md = std::move(o.md);
 
@@ -207,7 +213,12 @@ namespace comp {
 		return *this;
 	}
 
-	void Model::SetPosition(glm::vec3 position) {
+	void Model::SetScale(const float scale) {
+		this->scale = scale;
+		this->calculateMatrix();
+	}
+
+	void Model::SetPosition(const glm::vec3& position) {
 		this->position = glm::translate(glm::mat4(1.0f), position);
 		this->calculateMatrix();
 	}
@@ -216,7 +227,8 @@ namespace comp {
 		this->calculateMatrix();
 	}
 
-	void Model::Attach(render::Shader& shader) {
+	void Model::Attach(render::Shader& shader) const {
+		shader.Activate();
 		glBindVertexArray(VAO);
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_POSITION]);
@@ -225,13 +237,13 @@ namespace comp {
 			glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glEnableVertexAttribArray(p);
 		}
-		//{
-		//	glBindBuffer(GL_ARRAY_BUFFER, vbos[B_NORMAL]);
-		//	int p = glGetAttribLocation(shader.ID(), "Normal");
-		//	assert(p != -1 && "expects Normal attrib used by the shader");
-		//	glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		//	glEnableVertexAttribArray(p);
-		//}
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_NORMAL]);
+			int p = glGetAttribLocation(shader.ID(), "Normal");
+			assert(p != -1 && "expects Normal attrib used by the shader");
+			glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glEnableVertexAttribArray(p);
+		}
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_TEXCOORDS]);
 			int p = glGetAttribLocation(shader.ID(), "TexCoord");
@@ -242,19 +254,17 @@ namespace comp {
 		glBindVertexArray(0);
 	}
 
-	void Model::renderNode(render::Shader& shader, const glm::mat4& parentTx, const index n) {
+	void Model::renderNode(render::Shader& shader, const glm::mat4& parentTx, const index_t n) const {
 		const glm::mat4 thisTx = parentTx * md.nodes[n].tx;
-		shader.SetMat4("Mesh", thisTx);
+		shader.Uniforms().SetMat4("Mesh", thisTx);
 
 		// draw call
-		for (const index mIdx : md.nodes[n].meshes) {
-			// todo activate texture
+		for (const index_t mIdx : md.nodes[n].meshes) {
 			const auto tIdx = md.meshes[mIdx].materialIndex;
-			if (tIdx < md.textures.size()) {
+			if (tIdx < md.materials.size()) {
 				assert(tIdx >= 0 && "materialIndex is negative");
-				assert(tIdx < md.textures.size() && "invalid materialIndex");
-				assert(md.textures[tIdx].IsValid() && "invalid texture, texture loading has failed");
-				md.textures[tIdx].Bind(GL_TEXTURE0);
+				assert(tIdx < md.materials.size() && "invalid materialIndex");
+				md.materials[tIdx].Activate("material", shader);
 			}
 
 			glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -265,28 +275,28 @@ namespace comp {
 			);
 		}
 
-		for (const index cIdx : md.nodes[n].children) {
+		for (const index_t cIdx : md.nodes[n].children) {
 			renderNode(shader, thisTx, cIdx);
 		}
 	}
 
-	void Model::Render(render::Shader& shader) {
+	void Model::Render(render::Shader& shader) const {
 		glBindVertexArray(VAO);
-		shader.SetMat4("Model", matrixCached);
-		shader.SetInt("diffuse", 0);
+		shader.Uniforms().SetMat4("Model", matrixCached);
+		shader.Uniforms().SetInt("material.diffuse", 0);
 		renderNode(shader, glm::mat4(1.0f), 0);
 		glBindVertexArray(0);
 	}
 
-	void addNodeDataToList(std::vector<NodeData>& result, std::map<aiNode*, index>& nodesToIdxMapping, aiNode* node) {
+	void addNodeDataToList(std::vector<NodeData>& result, std::map<aiNode*, index_t>& nodesToIdxMapping, aiNode* node) {
 		if (node == nullptr) {
 			return;
 		}
-		const index newIndex = result.size();
+		const index_t newIndex = (index_t) result.size();
 		NodeData nd;
 		nd.tx = aiMatrix4x4ToGlm(&node->mTransformation);
 		nd.meshes.reserve(node->mNumMeshes);
-		for (index i = 0; i < node->mNumMeshes; i++) {
+		for (index_t i = 0; i < node->mNumMeshes; i++) {
 			nd.meshes.push_back(node->mMeshes[i]);
 		}
 		result.push_back(nd);
@@ -294,12 +304,12 @@ namespace comp {
 		if (node->mChildren == nullptr) {
 			return;
 		}
-		for (index i = 0; i < node->mNumChildren; i++) {
+		for (index_t i = 0; i < node->mNumChildren; i++) {
 			addNodeDataToList(result, nodesToIdxMapping, node->mChildren[i]);
 		}
 	}
 
-	void addChildrenToNodeData(std::vector<NodeData>& nodes, std::map<aiNode*, index>& nodesToIdxMapping, aiNode* node) {
+	void addChildrenToNodeData(std::vector<NodeData>& nodes, std::map<aiNode*, index_t>& nodesToIdxMapping, aiNode* node) {
 		if (node == nullptr) {
 			return;
 		}
@@ -307,15 +317,15 @@ namespace comp {
 			return;
 		}
 		assert(nodesToIdxMapping.find(node) != nodesToIdxMapping.end());
-		const index idx = nodesToIdxMapping[node];
+		const index_t idx = nodesToIdxMapping[node];
 		NodeData& nd = nodes[idx];
 		nd.children.reserve(node->mNumChildren);
-		for (index i = 0; i < node->mNumChildren; i++) {
+		for (index_t i = 0; i < node->mNumChildren; i++) {
 			assert(nodesToIdxMapping.find(node->mChildren[i]) != nodesToIdxMapping.end());
-			const index cIdx = nodesToIdxMapping[node->mChildren[i]];
+			const index_t cIdx = nodesToIdxMapping[node->mChildren[i]];
 			nd.children.push_back(cIdx);
 		}
-		for (index i = 0; i < node->mNumChildren; i++) {
+		for (index_t i = 0; i < node->mNumChildren; i++) {
 			addChildrenToNodeData(nodes, nodesToIdxMapping, node->mChildren[i]);
 		}
 	}
@@ -336,7 +346,7 @@ namespace comp {
 		unsigned int indicesRC = 0;
 
 		md.meshes.reserve(scene->mNumMeshes);
-		for (index i = 0; i < scene->mNumMeshes; i++) {
+		for (index_t i = 0; i < scene->mNumMeshes; i++) {
 			unsigned int thisMeshIndicesCount = scene->mMeshes[i]->mNumFaces * 3;
 			md.meshes.push_back(MeshData{
 					.materialIndex = scene->mMeshes[i]->mMaterialIndex,
@@ -384,26 +394,13 @@ namespace comp {
 			}
 		}
 
-		md.textures.reserve(scene->mNumMaterials);
-		render::TextureLoader tl;
-
+		md.materials.reserve(scene->mNumMaterials);
 		for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 			const aiMaterial* material = scene->mMaterials[i];
-			if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-				aiString path;
-				const bool success = material->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS;
-				if (success) {
-					std::string p(path.data);
-					if (p.substr(0, 2) == ("." + DELIMITER_CHAR)) {
-						p = p.substr(2, p.size() - 2);
-					}
-					std::string fullpath = directory + DELIMITER_CHAR + p;
-					md.textures.push_back(tl.Load(fullpath));
-				}
-			}
+			md.materials.push_back(render::Material(directory, material));
 		}
 
-		std::map<aiNode*, index> nodesToIdxMapping;
+		std::map<aiNode*, index_t> nodesToIdxMapping;
 		addNodeDataToList(md.nodes, nodesToIdxMapping, scene->mRootNode);
 		addChildrenToNodeData(md.nodes, nodesToIdxMapping, scene->mRootNode);
 

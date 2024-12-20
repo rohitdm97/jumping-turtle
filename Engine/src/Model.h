@@ -10,36 +10,36 @@
 
 namespace render {
 	class Shader;
-	class Texture;
+	class Material;
 }
 
 namespace comp {
 
 	struct NodeData {
-		index i;
+		index_t i;
 		glm::mat4 tx;
-		std::vector<index> meshes;
-		std::vector<index> children;
+		std::vector<index_t> meshes;
+		std::vector<index_t> children;
 	};
 
 	struct MeshData {
-		index materialIndex;
-		index baseVertex;
-		index baseIndex;
-		indexCount noOfIndices;
+		index_t materialIndex;
+		index_t baseVertex;
+		index_t baseIndex;
+		indexCount_t noOfIndices;
 	};
 
 	struct ModelData {
 		std::vector<NodeData> nodes;
 		std::vector<MeshData> meshes;
 
-		std::vector<render::Texture> textures;
+		std::vector<render::Material> materials;
 
 		// complete data
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
-		std::vector<index> indices;
+		std::vector<index_t> indices;
 	};
 
 	constexpr unsigned int B_INDEX = 0;
@@ -64,7 +64,7 @@ namespace comp {
 
 		void calculateMatrix();
 
-		void renderNode(render::Shader& shader, const glm::mat4& parentTx, const index n);
+		void renderNode(render::Shader& shader, const glm::mat4& parentTx, const index_t n) const;
 
 		void initGLComps() noexcept ;
 		void cleanUp() noexcept;
@@ -79,15 +79,16 @@ namespace comp {
 		// do not support copy assignment, see copy ctor
 		Model& operator=(const Model& o) = delete;
 		// move ctor
-		Model(Model&& o);
+		Model(Model&& o) noexcept;
 		// move assignment
-		Model& operator=(Model&& o);
+		Model& operator=(Model&& o) noexcept;
 
-		void SetPosition(glm::vec3 position);
+		void SetScale(const float);
+		void SetPosition(const glm::vec3& position);
 		void Rotate(glm::vec3 axis, float angleInRadians);
 
-		void Attach(render::Shader& shader);
-		void Render(render::Shader& shader);
+		void Attach(render::Shader& shader) const;
+		void Render(render::Shader& shader) const;
 	};
 
 	class ModelLoader {

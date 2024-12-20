@@ -40,7 +40,7 @@ namespace util {
             return l;
         }
 
-        bool Logger::isActive() {
+        bool Logger::isActive() const {
             return _global_level_ <= this->level;
         }
 
@@ -109,6 +109,22 @@ namespace util {
                 return *this;
             }
             std::cerr << str;
+            return *this;
+        }
+
+        Logger& Logger::operator<<(const glm::vec3& vec3) {
+            if (!isActive()) {
+                return *this;
+            }
+			std::cerr << "[" << vec3.x << ", " << vec3.y << ", " << vec3.z << "]";
+            return *this;
+        }
+
+        Logger& Logger::operator<<(const glm::vec4& vec4) {
+            if (!isActive()) {
+                return *this;
+            }
+			std::cerr << "[" << vec4.x << ", " << vec4.y << ", " << vec4.z << ", " << vec4.w << "]";
             return *this;
         }
 

@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Camera.h"
+#include "Light.h"
 
 
 typedef std::unique_ptr<render::Window> WindowPtr;
@@ -22,9 +23,13 @@ namespace engine {
 		WindowPtr window;
 		GameLoop loop;
 		KeyMap keyMap;
-		render::Shader shader;
+
+		render::Shader lightSourceShader;
+		render::Shader restShader;
+
 		comp::Model model;
 		Camera camera;
+		render::Light light;
 	public:
 		Engine(Game& game);
 

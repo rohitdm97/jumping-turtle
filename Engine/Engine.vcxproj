@@ -92,7 +92,9 @@
     <ClCompile Include="src\GameLoop.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\KeyMap.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -109,7 +111,9 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\GameLoop.h" />
     <ClInclude Include="src\KeyMap.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Shader.h" />
@@ -123,10 +127,15 @@
     </CopyFileToFolders>
     <None Include="shaders\camera.fs" />
     <None Include="shaders\camera.vs" />
+    <None Include="shaders\light.fs" />
+    <None Include="shaders\light.vs" />
+    <None Include="shaders\light_source.fs" />
+    <None Include="shaders\light_source.vs" />
     <None Include="shaders\simple.fs" />
     <None Include="shaders\simple.vs" />
     <None Include="src\actions.enums" />
     <None Include="src\movements.enums" />
+    <None Include="src\tex_types.enums" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

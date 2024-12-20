@@ -37,7 +37,7 @@ namespace render {
         return t;
     }
 
-    void Texture::Bind(unsigned int slot) {
+    void Texture::Bind(unsigned int slot) const {
         glActiveTexture(slot);
         glBindTexture(GL_TEXTURE_2D, ID_);
     }

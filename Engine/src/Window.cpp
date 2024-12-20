@@ -76,6 +76,9 @@ namespace render {
 
 	Window::Window(engine::Engine* engine, int width, int height, std::string title) : engine(*engine), width(width), height(height), xpos(0), ypos(0) {
 		auto titleChars = title.c_str();
+		int count;
+		GLFWmonitor** monitors = glfwGetMonitors(&count);
+		assert(monitors != nullptr && "failed to load the monitors");
 		this->ref = glfwCreateWindow(width, height, titleChars, NULL, NULL);
 		if (ref == NULL) {
 			LOG(TRACE) << "Failed to create GLFW window\n";
@@ -109,7 +112,7 @@ namespace render {
 		glfwSetCursorPosCallback(ref, windowcallback::mouse_callback);
 		glfwSetScrollCallback(ref, windowcallback::scroll_callback);
 
-		glfwSetInputMode(ref, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(ref, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	GLFWwindow* Window::Ref() const {

@@ -24,6 +24,7 @@ namespace engine {
 			SetIfNotPresent(GLFW_KEY_D, MOVE_RIGHT);
 			SetIfNotPresent(GLFW_KEY_SPACE, MOVE_UP);
 			SetIfNotPresent(GLFW_KEY_LEFT_SHIFT, MOVE_DOWN);
+			SetIfNotPresent(GLFW_KEY_C, DEV_CAPTURE_CAMERA);
 		}
 	}
 	bool KeyMap::SetIfNotPresent(Key key, Action a) {

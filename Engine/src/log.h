@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
 namespace util {
 	namespace logging {
 		enum Level {
@@ -17,7 +20,7 @@ namespace util {
 		class Logger {
 		private:
 			Level level;
-			bool isActive();
+			bool isActive() const;
 		public:
 			Logger(Level);
 			Logger& operator<<(int);
@@ -28,6 +31,8 @@ namespace util {
 			Logger& operator<<(bool);
 			Logger& operator<<(const char*);
 			Logger& operator<<(std::string);
+			Logger& operator<<(const glm::vec3&);
+			Logger& operator<<(const glm::vec4&);
 		};
 
 		Logger& _logging_maps_(Level level, const char* file, int line);

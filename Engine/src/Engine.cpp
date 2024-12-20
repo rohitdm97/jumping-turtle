@@ -3,6 +3,7 @@
 
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 #include "log.h"
@@ -39,11 +40,16 @@ namespace engine {
 		glEnable(GL_DEPTH_TEST);
 		GCE;
 
-		shader = render::ShaderLoader("camera").Create();
-		//this-> model = comp::ModelLoader().Load("..\\assets\\porsche_911_930_turbo_1975", "scene.gltf");
-		this->model = comp::createModel();
-		model.Attach(shader);
-		camera.SetPosition(glm::vec3(0.0f, 0.0f, +3.0f));
+		lightSourceShader = render::ShaderLoader("light_source").Create();
+		restShader = render::ShaderLoader("light").Create();
+
+		this-> model = comp::ModelLoader().Load("..\\assets\\porsche_911_930_turbo_1975", "scene.gltf");
+		//this->model = comp::createModel();
+		model.Attach(restShader);
+		// from old captured camera settings
+		camera = Camera(glm::vec3(1.5525, 4.472, 6.04472), glm::vec3(0, 1, 0), -104.6f, -29.0f);
+		this->light = render::Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f));
+		this->light.Attach(lightSourceShader);
 		// load scenes
 		// load shaders
 		// load textures
@@ -84,6 +90,9 @@ namespace engine {
 			break;
 		case engine::MOVE_DOWN:
 			break;
+		case engine::DEV_CAPTURE_CAMERA:
+			LOG(DEBUG) << "camera: " << camera << "\n";
+			break;
 		case engine::ACTION_LAST:
 			throw std::invalid_argument("invalid action, not supported");
 		default:
@@ -92,6 +101,15 @@ namespace engine {
 	}
 
 	void Engine::Update() {
+		glm::vec3 orange(209 / 255.0f, 68 / 255.0f, 21 / 255.0f);
+		glm::vec3 blue(22 / 255.0f, 127 / 255.0f, 175 / 255.0f);
+		float t = (float)sin(glfwGetTime() * 0.1f);
+		light.SetColor((orange - blue) * t + blue);
+		light.Rotate(glm::vec3(0, 1, 0), 0.1f);
+		float a = (float)glfwGetTime() * 0.1f;
+		glm::mat4 r = glm::rotate(glm::mat4(1.0), a, glm::vec3(-1,+1,+1));
+		glm::vec4 p = r * glm::vec4(1.0, 1.0, 1.0, 1.0);
+		light.SetPosition(glm::vec3(p.x,p.y,p.z));
 	}
 
 	void Engine::Render() {
@@ -100,10 +118,22 @@ namespace engine {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.Activate();
-		shader.SetMat4("CameraView", camera.GetViewMatrix());
-		shader.SetMat4("CameraProjection", camera.GetProjectionMatrix(window->AspectRatio()));
-		model.Render(shader);
+		{
+			auto& shader = restShader;
+			shader.Activate();
+			shader.Uniforms().SetCamera("camera", camera, window->AspectRatio());
+			shader.Uniforms().SetLight("light", light);
+
+			model.Render(shader);
+		}
+
+		{
+			auto& shader = lightSourceShader;
+			shader.Activate();
+			shader.Uniforms(true).SetCamera("camera", camera, window->AspectRatio());
+			shader.Uniforms(true).SetLight("light", light);
+			light.Render(shader);
+		}
 
 		GCE
 	}
@@ -117,13 +147,13 @@ namespace engine {
 		LOG(TRACE) << "cursor was moved x = " << xpos << " y = " << ypos << "\n";
 		double dx = xpos - lastX;
 		double dy = lastY - ypos;
-		lastX = xpos;
-		lastY = ypos;
+		lastX = (int) xpos;
+		lastY = (int) ypos;
 		LOG(TRACE) << "cursor diff dx = " << dx << " dy = " << dy << "\n";
 		camera.ProcessMouseMovement((float) dx, (float) dy);
 	}
 
-	void Engine::Scroll_callback(double xoffset, double yoffset) {
+	void Engine::Scroll_callback(double, double yoffset) {
 		LOG(TRACE) << "mouse was scrolled " << yoffset << "\n";
 		camera.ProcessMouseScroll((float) yoffset);
 	}
