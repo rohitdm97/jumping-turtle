@@ -23,6 +23,7 @@ namespace render {
 		std::ostream& operator<<(std::ostream& os, TexType tt);
 
 		render::Material whiteTile();
+		render::Material brickwall();
 	}
 
 	class Material {

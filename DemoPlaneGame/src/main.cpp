@@ -1,6 +1,7 @@
 /**
 */
 #include "log.h"
+#include "OS.h"
 
 #include "Game.h"
 #include "Engine.h"
@@ -21,6 +22,7 @@ namespace engine {
 }
 
 int main(int argc, char** argv) {
+	getCurrentDirectory();
 	std::stringstream ss;
 	ss << "[" << argc << "] ";
 	for (int i = 0; i < argc; i++) {

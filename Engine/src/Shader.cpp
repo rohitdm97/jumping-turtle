@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "debug.h"
 #include "log.h"
 #include "types.h"
 
@@ -13,7 +14,6 @@
 
 
 #include "Camera.h"
-#include "Light.h"
 
 void assertForNotFound(bool found, bool allowUnknowns) {
 	if (!found) {
@@ -29,7 +29,7 @@ namespace render {
 		std::string source;
 		std::ifstream file;
 		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		file.open("shaders//" + shaderName + ext);
+		file.open("shaders//" + shaderName + ext, std::ifstream::in);
 		std::stringstream ss;
 		ss << file.rdbuf();
 		file.close();
@@ -38,24 +38,27 @@ namespace render {
 	}
 
 	unsigned int load(std::string sType, std::string source, GLuint type) {
+		LOG(DEBUG) << "Compiling " << sType << " shader files\n";
 		const char* sourceChars = source.c_str();
 		unsigned int shader = glCreateShader(type);
 		glShaderSource(shader, 1, &sourceChars, NULL);
 		glCompileShader(shader);
 		{
 			int sucess;
-			char infoLog[1024];
+			char infoLog[8192];
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &sucess);
 			if (!sucess) {
-				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+				glGetShaderInfoLog(shader, 8192, NULL, infoLog);
 				LOG(ERROR) << "Failed to compile " << sType << " shader " << infoLog;
 				throw std::runtime_error("failed to compile " + sType + " shader");
 			}
 		}
+		LOG(DEBUG) << "Success: " << sType << " shader compiled\n";
 		return shader;
 	}
 
 	Shader ShaderLoader::Create() {
+		LOG(DEBUG) << "[" << shaderName << "] Loading shader files\n";
 		std::string vertexSource = loadContent(shaderName, ".vs");
 		std::string fragmentSource = loadContent(shaderName, ".fs");
 		unsigned int vertex = load("vertex", vertexSource, GL_VERTEX_SHADER);
@@ -66,10 +69,10 @@ namespace render {
 		glLinkProgram(ID);
 		{
 			int sucess;
-			char infoLog[1024];
+			char infoLog[8192];
 			glGetProgramiv(ID, GL_LINK_STATUS, &sucess);
 			if (!sucess) {
-				glGetProgramInfoLog(ID, 1024, NULL, infoLog);
+				glGetProgramInfoLog(ID, 8192, NULL, infoLog);
 				LOG(ERROR) << "Failed to link program " << infoLog;
 				throw std::runtime_error("failed to link program");
 			}
@@ -77,16 +80,18 @@ namespace render {
 		glValidateProgram(ID);
 		{
 			int sucess;
-			char infoLog[1024];
+			char infoLog[8192];
 			glGetProgramiv(ID, GL_VALIDATE_STATUS, &sucess);
 			if (!sucess) {
-				glGetProgramInfoLog(ID, 1024, NULL, infoLog);
+				glGetProgramInfoLog(ID, 8192, NULL, infoLog);
 				LOG(ERROR) << "Failed to validate program " << infoLog;
 				throw std::runtime_error("failed to validate program");
 			}
 		}
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
+
+		LOG(DEBUG) << "[" << shaderName << "] Shader loading completed\n";
 		return Shader(ID);
 	}
 
@@ -102,17 +107,33 @@ namespace render {
 		}
 	}
 
-	UniformStore Shader::Uniforms(bool allowUnknowns) {
+	UniformStore Shader::Uniforms(bool allowUnknowns) const {
+#ifdef ALLOW_UKNOWN_UNIFORMS
+			return UniformStore(ID_, true);
+#else
 		if (allowUnknowns) {
 			return UniformStore(ID_, true);
 		}
 		return store;
+#endif // ALLOW_UKNOWN_UNIFORMS
+	}
+
+	void UniformStore::SetBool(const std::string& name, bool value, bool) {
+		const auto [found, location] = getUniformLocation(name);
+		assertForNotFound(found, allowUnknowns);
+		if (found) glUniform1i(location, value ? 1 : 0);
 	}
 
 	void UniformStore::SetInt(const std::string& name, int value) {
 		const auto [found, location] = getUniformLocation(name);
 		assertForNotFound(found, allowUnknowns);
 		if (found) glUniform1i(location, value);
+	}
+
+	void UniformStore::SetFloat(const std::string& name, float value) {
+		const auto [found, location] = getUniformLocation(name);
+		assertForNotFound(found, allowUnknowns);
+		if (found) glUniform1f(location, value);
 	}
 
 	void UniformStore::SetVec3(const std::string& name, const glm::vec3& vec3) {
@@ -125,19 +146,6 @@ namespace render {
 		const auto [found, location] = getUniformLocation(name);
 		assertForNotFound(found, allowUnknowns);
 		if (found) glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat4));
-	}
-
-	void UniformStore::SetCamera(const std::string& name, const engine::Camera& camera, float aspectRatio) {
-		SetVec3(name + ".position", camera.Position());
-		SetMat4(name + ".view", camera.GetViewMatrix());
-		SetMat4(name + ".projection", camera.GetProjectionMatrix(aspectRatio));
-	}
-
-	void UniformStore::SetLight(const std::string& name, const render::Light& light) {
-		SetVec3(name + ".position", light.Position());
-		SetVec3(name + ".ambient", light.Color());
-		SetVec3(name + ".diffuse", light.Color());
-		SetVec3(name + ".specular", light.Color());
 	}
 
 	const unsigned int& Shader::ID() const {

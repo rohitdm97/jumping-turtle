@@ -21,6 +21,8 @@ namespace render {
 		Window(engine::Engine*, int width, int height, std::string title);
 		GLFWwindow* Ref() const;
 		float AspectRatio() const;
+		int Width() const;
+		int Height() const;
 
 		void Framebuffer_size_callback(int width, int height);
 		void Window_size_callback(int width, int height);

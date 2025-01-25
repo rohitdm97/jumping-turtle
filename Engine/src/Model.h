@@ -87,12 +87,12 @@ namespace comp {
 		void SetPosition(const glm::vec3& position);
 		void Rotate(glm::vec3 axis, float angleInRadians);
 
-		void Attach(render::Shader& shader) const;
 		void Render(render::Shader& shader) const;
 	};
 
 	class ModelLoader {
 	public:
+		Model Floor();
 		Model Load(std::string directory, std::string filepath);
 	};
 

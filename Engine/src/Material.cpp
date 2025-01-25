@@ -116,10 +116,23 @@ std::ostream& render::material::operator<<(std::ostream& os, TexType tt) {
 render::Material render::material::whiteTile() {
 	render::Material m;
 	render::TextureLoader tl;
-	const auto texFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "white_tile.png";
+	const auto diffuseFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "white_tilen_ormal.png";
 
-	m.Add(render::material::TexType::DIFFUSE, tl.Load(texFile));
-	m.Add(render::material::TexType::SPECULAR, tl.Load(texFile));
+	m.Add(render::material::TexType::DIFFUSE, tl.Load(diffuseFile));
+	m.Add(render::material::TexType::SPECULAR, tl.Load(diffuseFile));
+
+	return m;
+}
+
+render::Material render::material::brickwall() {
+	render::Material m;
+	render::TextureLoader tl;
+	const auto diffuseFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "brickwall.jpg";
+	const auto normalFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "brickwall_normal.jpg";
+
+	m.Add(render::material::TexType::DIFFUSE, tl.Load(normalFile));
+	m.Add(render::material::TexType::SPECULAR, tl.Load(diffuseFile));
+	//m.Add(render::material::TexType::NORMALS, tl.Load(normalFile));
 
 	return m;
 }
@@ -157,6 +170,7 @@ void render::Material::Add(material::TexType tt, const Texture& t) {
 }
 
 void render::Material::Activate(const std::string& name, render::Shader& shader) const {
+	shader.Uniforms(false).SetFloat(name + "." + "shininess", 2.0f);
 	for (auto& tPair : ts) {
 		const auto tt = tPair.first;
 		auto& t = tPair.second;

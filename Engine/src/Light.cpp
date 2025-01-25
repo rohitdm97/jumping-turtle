@@ -60,6 +60,8 @@ namespace render {
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * g_vertices_size, &g_positions[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(render::attribs::POSITION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(render::attribs::POSITION);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_t) * g_indices_count, &g_indices[0], GL_STATIC_DRAW);
@@ -146,6 +148,24 @@ namespace render {
 		return this->position;
 	}
 
+	void Light::SetUniforms(std::string name, render::UniformStore store) const {
+		store.SetBool(name + ".enabled", true, true);
+		store.SetInt(name + ".type", Type::POINT_LIGHT);
+		store.SetVec3(name + ".position", position);
+		store.SetVec3(name + ".ambient", this->color);
+		store.SetVec3(name + ".diffuse", this->color);
+		store.SetVec3(name + ".specular", this->color);
+
+		store.SetVec3(name + ".direction", glm::vec3(-0.7, -0.7, -0.2));
+
+		store.SetFloat(name + ".constant", 1.0f);
+		store.SetFloat(name + ".linear", 0.045f);
+		store.SetFloat(name + ".quadratic", 0.0075f);
+
+		store.SetFloat(name + ".cutoff", glm::cos(glm::radians(30.0f)));
+		store.SetFloat(name + ".cutoff", glm::cos(glm::radians(25.0f)));
+	}
+
 	void Light::SetPosition(const glm::vec3& position) {
 		this->position = position;
 		this->calculateMatrix();
@@ -160,24 +180,10 @@ namespace render {
 		this->calculateMatrix();
 	}
 
-	void Light::Attach(render::Shader& shader) const {
-		shader.Activate();
-		glBindVertexArray(VAO);
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			int p = glGetAttribLocation(shader.ID(), "Position");
-			assert(p != -1 && "expects Position attrib used by the shader");
-			glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(p);
-		}
-		glBindVertexArray(0);
-	}
-
 	void Light::Render(render::Shader& shader) const {
 		glBindVertexArray(VAO);
 		shader.Uniforms(true).SetMat4("Model", matrixCached);
 		shader.Uniforms(true).SetMat4("Mesh", glm::mat4(1.0));
-		shader.Uniforms(true).SetLight("light", *this);
 		glDrawElements(GL_TRIANGLES, g_indices_count, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}

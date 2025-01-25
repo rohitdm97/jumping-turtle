@@ -97,6 +97,8 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\_os_windows.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Texture.cpp" />
@@ -116,6 +118,8 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\OS.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\types.h" />
@@ -125,10 +129,16 @@
     <CopyFileToFolders Include="..\lib\assimp-vc143-mt.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <None Include="shaders\bold_color.fs" />
+    <None Include="shaders\bold_color.vs" />
     <None Include="shaders\camera.fs" />
     <None Include="shaders\camera.vs" />
     <None Include="shaders\light.fs" />
     <None Include="shaders\light.vs" />
+    <None Include="shaders\light_caster.fs" />
+    <None Include="shaders\light_caster.src.fs" />
+    <None Include="shaders\light_caster.src.vs" />
+    <None Include="shaders\light_caster.vs" />
     <None Include="shaders\light_source.fs" />
     <None Include="shaders\light_source.vs" />
     <None Include="shaders\simple.fs" />

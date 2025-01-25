@@ -148,10 +148,18 @@ namespace comp {
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbos[B_POSITION]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(this->md.positions[0]) * this->md.positions.size(), &this->md.positions[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(render::attribs::POSITION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(render::attribs::POSITION);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbos[B_NORMAL]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(this->md.normals[0]) * this->md.normals.size(), &this->md.normals[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(render::attribs::NORMAL, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(render::attribs::NORMAL);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbos[B_TEXCOORDS]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(this->md.texCoords[0]) * this->md.texCoords.size(), &this->md.texCoords[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(render::attribs::TEXUV, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(render::attribs::TEXUV);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos[B_INDEX]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(this->md.indices[0]) * this->md.indices.size(), &this->md.indices[0], GL_STATIC_DRAW);
@@ -213,45 +221,18 @@ namespace comp {
 		return *this;
 	}
 
-	void Model::SetScale(const float scale) {
-		this->scale = scale;
+	void Model::SetScale(const float scale_) {
+		this->scale = scale_;
 		this->calculateMatrix();
 	}
 
-	void Model::SetPosition(const glm::vec3& position) {
-		this->position = glm::translate(glm::mat4(1.0f), position);
+	void Model::SetPosition(const glm::vec3& position_) {
+		this->position = glm::translate(glm::mat4(1.0f), position_);
 		this->calculateMatrix();
 	}
 	void Model::Rotate(glm::vec3 axis, float angleInRadians) {
 		this->rotation = glm::rotate(this->rotation, angleInRadians, axis);
 		this->calculateMatrix();
-	}
-
-	void Model::Attach(render::Shader& shader) const {
-		shader.Activate();
-		glBindVertexArray(VAO);
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_POSITION]);
-			int p = glGetAttribLocation(shader.ID(), "Position");
-			assert(p != -1 && "expects Position attrib used by the shader");
-			glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(p);
-		}
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_NORMAL]);
-			int p = glGetAttribLocation(shader.ID(), "Normal");
-			assert(p != -1 && "expects Normal attrib used by the shader");
-			glVertexAttribPointer(p, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(p);
-		}
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbos[B_TEXCOORDS]);
-			int p = glGetAttribLocation(shader.ID(), "TexCoord");
-			assert(p != -1 && "expects TexCoord attrib used by the shader");
-			glVertexAttribPointer(p, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(p);
-		}
-		glBindVertexArray(0);
 	}
 
 	void Model::renderNode(render::Shader& shader, const glm::mat4& parentTx, const index_t n) const {
@@ -283,7 +264,6 @@ namespace comp {
 	void Model::Render(render::Shader& shader) const {
 		glBindVertexArray(VAO);
 		shader.Uniforms().SetMat4("Model", matrixCached);
-		shader.Uniforms().SetInt("material.diffuse", 0);
 		renderNode(shader, glm::mat4(1.0f), 0);
 		glBindVertexArray(0);
 	}
@@ -328,6 +308,72 @@ namespace comp {
 		for (index_t i = 0; i < node->mNumChildren; i++) {
 			addChildrenToNodeData(nodes, nodesToIdxMapping, node->mChildren[i]);
 		}
+	}
+
+	Model ModelLoader::Floor() {
+		const glm::vec3 l_positions[] = {
+			glm::vec3(-10.0f, -0.1f, -10.0f),
+			glm::vec3(-10.0f, -0.1f, +10.0f),
+			glm::vec3(+10.0f, -0.1f, +10.0f),
+			glm::vec3(+10.0f, -0.1f, -10.0f),
+		};
+
+		const glm::vec3 l_normals[] = {
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+		};
+
+		const glm::vec2 l_texCoords[] = {
+			glm::vec2(0.0f,  0.0f),
+			glm::vec2(1.0f,  0.0f),
+			glm::vec2(1.0f,  1.0f),
+			glm::vec2(0.0f,  1.0f),
+		};
+
+		const unsigned int l_indices[] = {
+			0, 1, 2,
+			0, 2, 3,
+		};
+
+		ModelData md;
+		md.nodes.reserve(1);
+		md.meshes.reserve(1);
+
+		const auto vCount = 4;
+		const auto iCount = 6;
+
+		MeshData mesh0;
+		mesh0.materialIndex = 0;
+		mesh0.noOfIndices = iCount;
+		mesh0.baseVertex = 0;
+		mesh0.baseIndex = 0;
+		md.meshes.push_back(mesh0);
+
+		md.positions.reserve(vCount);
+		md.normals.reserve(vCount);
+		md.texCoords.reserve(vCount);
+		md.indices.reserve(iCount);
+
+		const aiVector3D Zero(0.0f, 0.0f, 0.0f);
+		for (unsigned int j = 0; j < vCount; j++) {
+			md.positions.push_back(l_positions[j]);
+			md.normals.push_back(l_normals[j]);
+			md.texCoords.push_back(l_texCoords[j]);
+		}
+		for (unsigned int j = 0; j < iCount; j++) {
+			md.indices.push_back(l_indices[j]);
+		}
+
+		md.materials.push_back(render::material::brickwall());
+
+		NodeData node0;
+		node0.meshes.push_back(0);
+		node0.tx = glm::mat4(1.0);
+		md.nodes.push_back(node0);
+
+		return Model(md);
 	}
 
 	Model ModelLoader::Load(std::string directory, std::string filepath) {

@@ -8,6 +8,8 @@ typedef unsigned int indexCount_t;
 
 typedef unsigned int glObject;
 
+typedef unsigned int uint;
+
 // index that starts from 1
 typedef index_t posIndex_t;
 

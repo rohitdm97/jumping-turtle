@@ -11,3 +11,5 @@ void gl_check_error(const char* function, const char* file, int line);
 #else
 #define GCE
 #endif // CHECK_GL_ERRORS
+
+#define ALLOW_UKNOWN_UNIFORMS

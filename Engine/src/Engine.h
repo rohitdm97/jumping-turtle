@@ -7,15 +7,21 @@
 #include "GameLoop.h"
 #include "KeyMap.h"
 #include "Shader.h"
-#include "Model.h"
+#include "Scene.h"
 #include "Camera.h"
 #include "Light.h"
 
 
 typedef std::unique_ptr<render::Window> WindowPtr;
-typedef std::unique_ptr<comp::Model> ModelPtr;
+typedef std::unique_ptr<scene::Scene> ScenePtr;
 
 namespace engine {
+
+	struct ViewPort {
+		int x, y;
+		int width, height;
+	};
+
 	class Engine {
 	private:
 		static bool init;
@@ -25,11 +31,18 @@ namespace engine {
 		KeyMap keyMap;
 
 		render::Shader lightSourceShader;
+		render::Shader boldShader;
 		render::Shader restShader;
 
-		comp::Model model;
-		Camera camera;
+		ScenePtr scene;
+
+		SideViewCamera topView;
+		SideViewCamera leftView;
+		SideViewCamera frontView;
+		Camera flyCamera;
 		render::Light light;
+
+		void render(ViewPort, CameraMatrixProvider&);
 	public:
 		Engine(Game& game);
 

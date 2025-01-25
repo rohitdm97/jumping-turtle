@@ -19,7 +19,7 @@ struct Light {
 struct Material {
 	sampler2D diffuse;
 	sampler2D specular;
-	float shininess = 32;
+	float shininess;
 };
 
 in vec4 vPosition;

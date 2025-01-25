@@ -121,4 +121,10 @@ namespace render {
 	float Window::AspectRatio() const {
 		return width / ((float)height);
 	}
+	int Window::Width() const {
+		return width;
+	}
+	int Window::Height() const {
+		return height;
+	}
 }

@@ -9,10 +9,10 @@
 #include "log.h"
 
 bool initGlfw() {
-	LOG(TRACE) << "Initializing GLFW 3.3\n";
+	LOG(TRACE) << "Initializing GLFW 4.5\n";
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef ENABLE_DEBUG_CONTEXT
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
@@ -26,6 +26,7 @@ int lastY = 0;
 bool firstMouseEvent = true;
 
 namespace engine {
+
 	Engine::Engine(Game& game) : game(game) {
 		LOG(TRACE) << "Engine is created for the game\n";
 	}
@@ -40,16 +41,22 @@ namespace engine {
 		glEnable(GL_DEPTH_TEST);
 		GCE;
 
-		lightSourceShader = render::ShaderLoader("light_source").Create();
-		restShader = render::ShaderLoader("light").Create();
+		lightSourceShader = render::ShaderLoader("light_caster.src").Create();
+		boldShader = render::ShaderLoader("bold_color").Create();
+		restShader = render::ShaderLoader("light_caster").Create();
 
-		this-> model = comp::ModelLoader().Load("..\\assets\\porsche_911_930_turbo_1975", "scene.gltf");
-		//this->model = comp::createModel();
-		model.Attach(restShader);
-		// from old captured camera settings
-		camera = Camera(glm::vec3(1.5525, 4.472, 6.04472), glm::vec3(0, 1, 0), -104.6f, -29.0f);
-		this->light = render::Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f));
-		this->light.Attach(lightSourceShader);
+		this->scene = std::make_unique<scene::Scene>();
+		flyCamera = Camera().WithPosition(glm::vec3(1.5525, 4.472, 6.04472)).WithLookAt(glm::vec3());
+		topView = SideViewCamera(SideViewCamera::TOP);
+		leftView = SideViewCamera(SideViewCamera::LEFT);
+		frontView = SideViewCamera(SideViewCamera::FRONT);
+
+		glm::vec3 orange(242/ 255.0f, 197 / 255.0f, 170 / 255.0f);
+		this->light = render::Light(glm::vec3(1.0f, 1.0f, 1.0f), orange);
+
+		restShader.Activate();
+		restShader.Uniforms().SetInt("lights_length", 1);
+
 		// load scenes
 		// load shaders
 		// load textures
@@ -75,65 +82,132 @@ namespace engine {
 			glfwSetWindowShouldClose(Window().Ref(), true);
 			break;
 		case engine::MOVE_FORWARD:
-			camera.ProcessKeyboard(camera::FORWARD, delta);
+			flyCamera.ProcessKeyboard(camera::FORWARD, delta);
 			break;
 		case engine::MOVE_LEFT:
-			camera.ProcessKeyboard(camera::LEFT, delta);
+			flyCamera.ProcessKeyboard(camera::LEFT, delta);
 			break;
 		case engine::MOVE_BACKWARD:
-			camera.ProcessKeyboard(camera::BACKWARD, delta);
+			flyCamera.ProcessKeyboard(camera::BACKWARD, delta);
 			break;
 		case engine::MOVE_RIGHT:
-			camera.ProcessKeyboard(camera::RIGHT, delta);
+			flyCamera.ProcessKeyboard(camera::RIGHT, delta);
 			break;
 		case engine::MOVE_UP:
 			break;
 		case engine::MOVE_DOWN:
 			break;
 		case engine::DEV_CAPTURE_CAMERA:
-			LOG(DEBUG) << "camera: " << camera << "\n";
+			LOG(DEBUG) << "camera: " << flyCamera << "\n";
 			break;
 		case engine::ACTION_LAST:
-			throw std::invalid_argument("invalid action, not supported");
 		default:
-			break;
+			throw std::invalid_argument("invalid action, not supported");
 		}
 	}
 
 	void Engine::Update() {
-		glm::vec3 orange(209 / 255.0f, 68 / 255.0f, 21 / 255.0f);
-		glm::vec3 blue(22 / 255.0f, 127 / 255.0f, 175 / 255.0f);
-		float t = (float)sin(glfwGetTime() * 0.1f);
-		light.SetColor((orange - blue) * t + blue);
-		light.Rotate(glm::vec3(0, 1, 0), 0.1f);
-		float a = (float)glfwGetTime() * 0.1f;
-		glm::mat4 r = glm::rotate(glm::mat4(1.0), a, glm::vec3(-1,+1,+1));
-		glm::vec4 p = r * glm::vec4(1.0, 1.0, 1.0, 1.0);
-		light.SetPosition(glm::vec3(p.x,p.y,p.z));
+		const glm::vec3 orange(209 / 255.0f, 68 / 255.0f, 21 / 255.0f);
+		const glm::vec3 blue(22 / 255.0f, 127 / 255.0f, 175 / 255.0f);
+		const float t = (float)sin(glfwGetTime() * 0.1f);
+		//light.SetColor((orange - blue) * t + blue);
+		//light.Rotate(glm::vec3(0, 1, 0), 0.1f);
+		const float a = (float)glfwGetTime() * 0.1f;
+		const glm::mat4 r = glm::rotate(glm::mat4(1.0), a, glm::vec3(-1,+1,+1));
+		const glm::vec4 p = r * glm::vec4(1.0, 1.0, 1.0, 1.0);
+		//light.SetPosition(glm::vec3(p.x,p.y,p.z));
 	}
 
-	void Engine::Render() {
-		GCE
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	void Engine::render(ViewPort vp, CameraMatrixProvider& camera) {
+		glViewport(vp.x, vp.y, vp.width, vp.height);
+		const float ar = vp.width / ((float) vp.height);
 
 		{
 			auto& shader = restShader;
 			shader.Activate();
-			shader.Uniforms().SetCamera("camera", camera, window->AspectRatio());
-			shader.Uniforms().SetLight("light", light);
+			camera.SetUniforms("camera", shader.Uniforms(), ar);
+			light.SetUniforms("lights[0]", shader.Uniforms());
 
-			model.Render(shader);
+			scene->Render(shader);
 		}
 
 		{
 			auto& shader = lightSourceShader;
 			shader.Activate();
-			shader.Uniforms(true).SetCamera("camera", camera, window->AspectRatio());
-			shader.Uniforms(true).SetLight("light", light);
+			camera.SetUniforms("camera", shader.Uniforms(true), ar);
+			light.SetUniforms("light", shader.Uniforms(true));
 			light.Render(shader);
 		}
+	}
+
+	void Engine::Render() {
+		GCE;
+
+		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+#define SPLIT_VIEWPORT
+#ifdef SPLIT_VIEWPORT
+		glViewport(0, 0, window->Width(), window->Height());
+		const int w_2 = window->Width() / 2;
+		const int h_2 = window->Height() / 2;
+		for (unsigned int i = 0; i < 4; i++) {
+			const unsigned int row = i / 2;
+			const unsigned int col = i % 2;
+			ViewPort vp = {
+				.x = (int) col * w_2,
+				.y = (int) row * h_2,
+				.width = w_2,
+				.height = h_2,
+			};
+			if (i == 1) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			switch (i) {
+			case 0:
+				render(vp, frontView);break;
+			case 1:
+				render(vp, flyCamera);break;
+			case 2:
+				render(vp, leftView);break;
+			case 3:
+				render(vp, topView);break;
+			default:
+				assert(false);
+			}
+		//	glViewport(, row * h_2, (col + 1) * w_2, (row + 1) * h_2);
+
+		//	{
+		//		auto& shader = restShader;
+		//		shader.Activate();
+		//		shader.Uniforms().SetCamera("camera", flyCamera, window->AspectRatio());
+		//		light.SetUniforms("lights[0]", shader.Uniforms());
+
+		//		scene->Render(shader);
+		//	}
+
+		//	{
+		//		auto& shader = lightSourceShader;
+		//		shader.Activate();
+		//		shader.Uniforms(true).SetCamera("camera", flyCamera, window->AspectRatio());
+		//		light.SetUniforms("light", shader.Uniforms(true));
+		//		light.Render(shader);
+		//	}
+		}
+		//glViewport(0, 0, window->Width(), window->Height());
+#else
+		glDisable(GL_CULL_FACE);
+		ViewPort vp = {
+			.x = 0,
+			.y = 0,
+			.width = window->Width(),
+			.height = window->Height(),
+		};
+		render(vp, flyCamera);
+#endif
 
 		GCE
 	}
@@ -150,12 +224,12 @@ namespace engine {
 		lastX = (int) xpos;
 		lastY = (int) ypos;
 		LOG(TRACE) << "cursor diff dx = " << dx << " dy = " << dy << "\n";
-		camera.ProcessMouseMovement((float) dx, (float) dy);
+		flyCamera.ProcessMouseMovement((float) dx, (float) dy);
 	}
 
 	void Engine::Scroll_callback(double, double yoffset) {
 		LOG(TRACE) << "mouse was scrolled " << yoffset << "\n";
-		camera.ProcessMouseScroll((float) yoffset);
+		flyCamera.ProcessMouseScroll((float) yoffset);
 	}
 
 	Engine::~Engine() {

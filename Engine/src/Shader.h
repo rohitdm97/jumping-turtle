@@ -1,4 +1,5 @@
 #pragma once
+#include "types.h"
 
 #include <string>
 #include <map>
@@ -13,7 +14,12 @@ namespace engine {
 namespace render {
 
 	class Shader;
-	class Light;
+
+	namespace attribs {
+		constexpr uint POSITION = 0;
+		constexpr uint NORMAL = 1;
+		constexpr uint TEXUV = 2;
+	}
 
 	enum ShaderType {
 		NONE = 0,
@@ -41,11 +47,11 @@ namespace render {
 		UniformStore(const unsigned int);
 		UniformStore(const unsigned int, bool);
 
+		void SetBool(const std::string& name, bool, bool);
 		void SetInt(const std::string& name, int value);
+		void SetFloat(const std::string& name, float value);
 		void SetVec3(const std::string& name, const glm::vec3&);
 		void SetMat4(const std::string& name, glm::mat4);
-		void SetCamera(const std::string& name, const engine::Camera& camera, float);
-		void SetLight(const std::string& name, const render::Light&);
 	};
 
 	class Shader {
@@ -59,8 +65,11 @@ namespace render {
 
 		void Activate() const;
 
-		UniformStore Uniforms(bool allowUnknowns = false);
+		UniformStore Uniforms(bool allowUnknowns = false) const;
 
 		const unsigned int& ID() const;
 	};
 }
+
+// todo create a global shader pool so that shaders can be deleted
+

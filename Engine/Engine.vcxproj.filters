@@ -49,6 +49,9 @@
     <Filter Include="Resource Files\shaders\light">
       <UniqueIdentifier>{ae3d9866-c301-4699-8edf-c4a18e0fb789}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\shaders\light_caster">
+      <UniqueIdentifier>{f9ba805d-0de1-4567-ac03-9ae43e2ec20c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine.cpp">
@@ -105,6 +108,12 @@
     <ClCompile Include="src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\_os_windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game.h">
@@ -155,6 +164,12 @@
     <ClInclude Include="src\Light.h">
       <Filter>Header Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="src\OS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\simple.fs">
@@ -189,6 +204,24 @@
     </None>
     <None Include="src\tex_types.enums">
       <Filter>Header Files\render</Filter>
+    </None>
+    <None Include="shaders\light_caster.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </None>
+    <None Include="shaders\light_caster.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </None>
+    <None Include="shaders\light_caster.src.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </None>
+    <None Include="shaders\light_caster.src.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </None>
+    <None Include="shaders\bold_color.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </None>
+    <None Include="shaders\bold_color.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
