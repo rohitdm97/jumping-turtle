@@ -28,6 +28,7 @@ bool firstMouseEvent = true;
 namespace engine {
 
 	Engine::Engine(Game& game) : game(game) {
+		UnsafeAlloc_ = {};
 		LOG(TRACE) << "Engine is created for the game\n";
 	}
 
@@ -45,6 +46,8 @@ namespace engine {
 		boldShader = render::ShaderLoader("bold_color").Create();
 		restShader = render::ShaderLoader("light_caster").Create();
 
+		this->keyMap = engine::KeyMap(*this);
+		this->spawner = std::unique_ptr<comp::Model>(comp::CreateParticleSpawner());
 		this->scene = std::make_unique<scene::Scene>();
 		flyCamera = Camera().WithPosition(glm::vec3(1.5525, 4.472, 6.04472)).WithLookAt(glm::vec3());
 		topView = SideViewCamera(SideViewCamera::TOP);
@@ -67,7 +70,7 @@ namespace engine {
 		loop.Start(*this);
 	}
 
-	KeyMap& Engine::KeyMap() {
+	KeyMap& Engine::GetKeyMap() {
 		return keyMap;
 	}
 
@@ -75,35 +78,20 @@ namespace engine {
 		return *window;
 	}
 
-	void Engine::ProcessInput(Action a) {
-		const double delta = 1.0 / 60.0;
-		switch (a) {
-		case engine::EXIT:
-			glfwSetWindowShouldClose(Window().Ref(), true);
-			break;
-		case engine::MOVE_FORWARD:
-			flyCamera.ProcessKeyboard(camera::FORWARD, delta);
-			break;
-		case engine::MOVE_LEFT:
-			flyCamera.ProcessKeyboard(camera::LEFT, delta);
-			break;
-		case engine::MOVE_BACKWARD:
-			flyCamera.ProcessKeyboard(camera::BACKWARD, delta);
-			break;
-		case engine::MOVE_RIGHT:
-			flyCamera.ProcessKeyboard(camera::RIGHT, delta);
-			break;
-		case engine::MOVE_UP:
-			break;
-		case engine::MOVE_DOWN:
-			break;
-		case engine::DEV_CAPTURE_CAMERA:
-			LOG(DEBUG) << "camera: " << flyCamera << "\n";
-			break;
-		case engine::ACTION_LAST:
-		default:
-			throw std::invalid_argument("invalid action, not supported");
-		}
+	Camera& Engine::FlyCamera() {
+		return flyCamera;
+	}
+
+	entities::System& Engine::EntitySystem() {
+		return entitySystem;
+	}
+
+	const comp::Model& Engine::GetSpawner() const {
+		return *spawner;
+	}
+
+	render::Light& Engine::Light() {
+		return light;
 	}
 
 	void Engine::Update() {
@@ -118,12 +106,12 @@ namespace engine {
 		//light.SetPosition(glm::vec3(p.x,p.y,p.z));
 	}
 
-	void Engine::render(ViewPort vp, CameraMatrixProvider& camera) {
+	void Engine::render(ViewPort vp, CameraMatrixProvider& camera, render::Shader& restShader_, render::Shader& lightSourceShader_) {
 		glViewport(vp.x, vp.y, vp.width, vp.height);
 		const float ar = vp.width / ((float) vp.height);
 
 		{
-			auto& shader = restShader;
+			auto& shader = restShader_;
 			shader.Activate();
 			camera.SetUniforms("camera", shader.Uniforms(), ar);
 			light.SetUniforms("lights[0]", shader.Uniforms());
@@ -132,7 +120,7 @@ namespace engine {
 		}
 
 		{
-			auto& shader = lightSourceShader;
+			auto& shader = lightSourceShader_;
 			shader.Activate();
 			camera.SetUniforms("camera", shader.Uniforms(true), ar);
 			light.SetUniforms("light", shader.Uniforms(true));
@@ -140,13 +128,13 @@ namespace engine {
 		}
 	}
 
-	void Engine::Render() {
+	void Engine::Render(double) {
 		GCE;
 
 		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#define SPLIT_VIEWPORT
+#define SPLIT_VIEWPORT1
 #ifdef SPLIT_VIEWPORT
 		glViewport(0, 0, window->Width(), window->Height());
 		const int w_2 = window->Width() / 2;
@@ -168,45 +156,30 @@ namespace engine {
 			}
 			switch (i) {
 			case 0:
-				render(vp, frontView);break;
+				render(vp, frontView, boldShader, boldShader);break;
 			case 1:
-				render(vp, flyCamera);break;
+				render(vp, flyCamera, restShader, lightSourceShader);break;
 			case 2:
-				render(vp, leftView);break;
+				render(vp, leftView, boldShader, boldShader);break;
 			case 3:
-				render(vp, topView);break;
+				render(vp, topView, boldShader, boldShader);break;
 			default:
 				assert(false);
 			}
 		//	glViewport(, row * h_2, (col + 1) * w_2, (row + 1) * h_2);
-
-		//	{
-		//		auto& shader = restShader;
-		//		shader.Activate();
-		//		shader.Uniforms().SetCamera("camera", flyCamera, window->AspectRatio());
-		//		light.SetUniforms("lights[0]", shader.Uniforms());
-
-		//		scene->Render(shader);
-		//	}
-
-		//	{
-		//		auto& shader = lightSourceShader;
-		//		shader.Activate();
-		//		shader.Uniforms(true).SetCamera("camera", flyCamera, window->AspectRatio());
-		//		light.SetUniforms("light", shader.Uniforms(true));
-		//		light.Render(shader);
-		//	}
-		}
-		//glViewport(0, 0, window->Width(), window->Height());
 #else
-		glDisable(GL_CULL_FACE);
+		glViewport(0, 0, window->Width(), window->Height());
+		auto i = 1;
+		const unsigned int row = i / 2;
+		const unsigned int col = i % 2;
 		ViewPort vp = {
 			.x = 0,
 			.y = 0,
 			.width = window->Width(),
 			.height = window->Height(),
 		};
-		render(vp, flyCamera);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		render(vp, flyCamera, restShader, lightSourceShader);
 #endif
 
 		GCE

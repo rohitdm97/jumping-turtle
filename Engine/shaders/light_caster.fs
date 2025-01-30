@@ -95,8 +95,8 @@ vec3 Calc_direction_light(Light l1) {
 }
 
 vec3 Calc_point_light(Light l1) {
-	// vec3 nNormal = normalize(vNormal);
-	vec3 nNormal = normalize(texture(material.normals, vTexCoord)).xyz;
+	vec3 nNormal = normalize(vNormal);
+	// vec3 nNormal = normalize(texture(material.normals, vTexCoord)).xyz;
 	vec3 fragLightDir = normalize(l1.position - vPosition.xyz);
 	vec3 reflectDir = reflect(-fragLightDir, nNormal);
 
@@ -113,8 +113,8 @@ vec3 Calc_point_light(Light l1) {
 }
 
 vec3 Calc_spot_light(Light l1) {
-	// vec3 nNormal = normalize(vNormal);
-	vec3 nNormal = normalize(texture(material.normals, vTexCoord)).xyz;
+	vec3 nNormal = normalize(vNormal);
+	// vec3 nNormal = normalize(texture(material.normals, vTexCoord)).xyz;
 	vec3 fragLightDir = normalize(l1.position - vPosition.xyz);
 	vec3 reflectDir = reflect(-fragLightDir, nNormal);
 

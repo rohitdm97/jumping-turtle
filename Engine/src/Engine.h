@@ -5,15 +5,18 @@
 
 #include "Window.h"
 #include "GameLoop.h"
+#include "entities.h"
 #include "KeyMap.h"
 #include "Shader.h"
 #include "Scene.h"
 #include "Camera.h"
 #include "Light.h"
+#include "UnsafeAlloc.h"
 
 
 typedef std::unique_ptr<render::Window> WindowPtr;
 typedef std::unique_ptr<scene::Scene> ScenePtr;
+typedef std::unique_ptr<comp::Model> ModelPtr;
 
 namespace engine {
 
@@ -23,17 +26,21 @@ namespace engine {
 	};
 
 	class Engine {
+	public:
+		UnsafeAlloc UnsafeAlloc_;
 	private:
 		static bool init;
 		Game& game;
 		WindowPtr window;
 		GameLoop loop;
-		KeyMap keyMap;
+		entities::System entitySystem;
+		engine::KeyMap keyMap;
 
 		render::Shader lightSourceShader;
 		render::Shader boldShader;
 		render::Shader restShader;
 
+		ModelPtr spawner;
 		ScenePtr scene;
 
 		SideViewCamera topView;
@@ -42,19 +49,21 @@ namespace engine {
 		Camera flyCamera;
 		render::Light light;
 
-		void render(ViewPort, CameraMatrixProvider&);
+		void render(ViewPort, CameraMatrixProvider&, render::Shader& , render::Shader&);
 	public:
 		Engine(Game& game);
 
-		KeyMap& KeyMap();
+		KeyMap& GetKeyMap();
 		render::Window& Window() const;
+		Camera& FlyCamera();
+		entities::System& EntitySystem();
+		const comp::Model& GetSpawner() const;
+		render::Light& Light();
 
-		bool LoadGLAD();
 		void Load();
 		void Start();
-		void ProcessInput(Action a);
 		void Update();
-		void Render();
+		void Render(double);
 
 		void Mouse_callback(double xpos, double ypos);
 		void Scroll_callback(double xoffset, double yoffset);

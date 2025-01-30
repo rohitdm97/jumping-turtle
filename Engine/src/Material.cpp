@@ -116,7 +116,7 @@ std::ostream& render::material::operator<<(std::ostream& os, TexType tt) {
 render::Material render::material::whiteTile() {
 	render::Material m;
 	render::TextureLoader tl;
-	const auto diffuseFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "white_tilen_ormal.png";
+	const auto diffuseFile = std::string(".\\assets") + DELIMITER_STR + "white_tilen_ormal.png";
 
 	m.Add(render::material::TexType::DIFFUSE, tl.Load(diffuseFile));
 	m.Add(render::material::TexType::SPECULAR, tl.Load(diffuseFile));
@@ -127,8 +127,8 @@ render::Material render::material::whiteTile() {
 render::Material render::material::brickwall() {
 	render::Material m;
 	render::TextureLoader tl;
-	const auto diffuseFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "brickwall.jpg";
-	const auto normalFile = std::string("..") + DELIMITER_STR + "assets" + DELIMITER_STR + "brickwall_normal.jpg";
+	const auto diffuseFile = std::string(".\\assets") + DELIMITER_STR + "brickwall.jpg";
+	const auto normalFile = std::string(".\\assets") + DELIMITER_STR + "brickwall_normal.jpg";
 
 	m.Add(render::material::TexType::DIFFUSE, tl.Load(normalFile));
 	m.Add(render::material::TexType::SPECULAR, tl.Load(diffuseFile));

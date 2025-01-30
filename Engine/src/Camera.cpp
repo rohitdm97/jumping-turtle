@@ -9,7 +9,7 @@
 
 constexpr float YAW = -90.0f;
 constexpr float PITCH = 0.0f;
-constexpr float SPEED = 2.5f;
+constexpr float SPEED = 10.0f / 60.0f;
 constexpr float SENSITIVITY = 0.1f;
 constexpr float ZOOM = 45.0f;
 
@@ -40,7 +40,7 @@ namespace engine {
 	}
 
 	void Camera::updateCameraVectors() {
-		glm::vec3 front_;
+		glm::vec3 front_{};
 		front_.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		front_.y = sin(glm::radians(pitch));
 		front_.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -66,6 +66,22 @@ namespace engine {
 
 	void Camera::SetPosition(glm::vec3 position_) {
 		this->position = position_;
+	}
+
+	const glm::vec3& Camera::Position() const {
+		return position;
+	}
+	const glm::vec3& Camera::Front() const {
+		return front;
+	}
+	const glm::vec3& Camera::Up() const {
+		return up;
+	}
+	const glm::vec3& Camera::Right() const {
+		return right;
+	}
+	const glm::vec3& Camera::WorldUp() const {
+		return worldUp;
 	}
 
 	Camera& Camera::WithPosition(glm::vec3 position_) {
@@ -122,9 +138,9 @@ namespace engine {
 		store.SetMat4(name + ".projection", projection);
 	}
 
-	void Camera::ProcessKeyboard(camera::Movement dir, double delta) {
+	void Camera::ProcessKeyboard(camera::Movement dir) {
 		LOG(TRACE) << "Processing Keyboard event " << dir << "\n"; 
-		float dx = speed * (float) delta;
+		float dx = speed;
 		switch (dir) {
 		case engine::camera::FORWARD:
 			position += front * dx;
@@ -159,10 +175,10 @@ namespace engine {
 			}
 		}
 		if (yaw > 180.0f) {
-			yaw = 180.0f;
+			yaw = yaw - 360.0f;
 		}
 		if (yaw < -180.0f) {
-			yaw = -180.0f;
+			yaw = yaw + 360.0f;
 		}
 
 		LOG(TRACE) << "pitch = " << pitch << " yaw = " << yaw << "\n";
@@ -270,7 +286,8 @@ namespace engine {
 
 		store.SetVec3(name + ".position", position);
 		store.SetMat4(name + ".view", view);
-		store.SetMat4(name + ".projection", glm::mat4(1.0f));
+		float range = 5;
+		store.SetMat4(name + ".projection", glm::ortho<float>(-range, range, -range, range, -range, range));
 	}
 
 }

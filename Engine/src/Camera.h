@@ -53,6 +53,12 @@ namespace engine {
 		Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch);
 		void SetPosition(glm::vec3 position);
 
+		const glm::vec3& Position() const;
+		const glm::vec3& Front() const;
+		const glm::vec3& Up() const;
+		const glm::vec3& Right() const;
+		const glm::vec3& WorldUp() const;
+
 		// returns self
 		Camera& WithPosition(glm::vec3);
 		Camera& WithYaw(float);
@@ -61,7 +67,7 @@ namespace engine {
 
 		void SetUniforms(std::string name, render::UniformStore store, float) const;
 
-		void ProcessKeyboard(camera::Movement dir, double delta);
+		void ProcessKeyboard(camera::Movement dir);
 		void ProcessMouseMovement(float xoffset, float yoffset, bool constraintPitch = true);
 		void ProcessMouseScroll(float yoffset);
 

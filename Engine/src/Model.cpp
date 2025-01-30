@@ -15,7 +15,7 @@
 #include "Material.h"
 
 inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from) {
-	glm::mat4 to;
+	glm::mat4 to{};
 
 	to[0][0] = from->a1; to[0][1] = from->b1;  to[0][2] = from->c1; to[0][3] = from->d1;
 	to[1][0] = from->a2; to[1][1] = from->b2;  to[1][2] = from->c2; to[1][3] = from->d2;
@@ -28,9 +28,9 @@ inline glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4* from) {
 namespace static_data {
 	namespace model {
 		glm::vec3 g_positions[] = {
-			glm::vec3(0.5f, -0.5f, 0.0f),  // bottom right
-			glm::vec3(-0.5f, -0.5f, 0.0f),  // bottom left
-			glm::vec3(0.0f,  0.5f, 0.0f),  // top 
+			glm::vec3(0.0f, 2, 0) + glm::vec3(0.5f, -0.5f, 0.0f),  // bottom right
+			glm::vec3(0.0f, 2, 0) + glm::vec3(-0.5f, -0.5f, 0.0f),  // bottom left
+			glm::vec3(0.0f, 2, 0) + glm::vec3(0.0f,  0.5f, 0.0f),  // top 
 		};
 
 		glm::vec3 g_normals[] = {
@@ -60,7 +60,7 @@ namespace comp {
 		const auto vCount = 3;
 		const auto iCount = 3;
 
-		MeshData mesh0;
+		MeshData mesh0{};
 		mesh0.materialIndex = 0;
 		mesh0.noOfIndices = iCount;
 		mesh0.baseVertex = 0;
@@ -91,6 +91,70 @@ namespace comp {
 		md.nodes.push_back(node0);
 
 		return Model(md);
+	}
+	Model* CreateParticleSpawner() {
+		glm::vec3 l_positions[] = {
+			glm::vec3(0.5f, -0.5f, 0.0f),  // bottom right
+			glm::vec3(-0.5f, -0.5f, 0.0f),  // bottom left
+			glm::vec3(0.0f,  0.5f, 0.0f),  // top 
+		};
+
+		glm::vec3 l_normals[] = {
+			glm::vec3(0.0f,  0.0f, 1.0f),  // bottom right
+			glm::vec3(0.0f,  0.0f, 1.0f),  // bottom left
+			glm::vec3(0.0f,  0.0f, 1.0f),  // top 
+		};
+
+		glm::vec2 l_texCoords[] = {
+			glm::vec2(0.0f,  0.0f),  // bottom right
+			glm::vec2(1.0f,  0.0f),  // bottom left
+			glm::vec2(0.5f,  1.0f),  // top 
+		};
+
+		unsigned int l_indices[] = {
+			0, 2, 1,
+		};
+
+		ModelData md;
+		md.nodes.reserve(1);
+		md.meshes.reserve(1);
+
+		const auto vCount = 3;
+		const auto iCount = 3;
+
+		MeshData mesh0{};
+		mesh0.materialIndex = 0;
+		mesh0.noOfIndices = iCount;
+		mesh0.baseVertex = 0;
+		mesh0.baseIndex = 0;
+		md.meshes.push_back(mesh0);
+
+		md.positions.reserve(vCount);
+		md.normals.reserve(vCount);
+		md.texCoords.reserve(vCount);
+		md.indices.reserve(iCount);
+
+		const aiVector3D Zero(0.0f, 0.0f, 0.0f);
+		for (unsigned int j = 0; j < vCount; j++) {
+			md.positions.push_back(l_positions[j]);
+			md.normals.push_back(l_normals[j]);
+			md.texCoords.push_back(l_texCoords[j]);
+		}
+		for (unsigned int j = 0; j < iCount; j++) {
+			md.indices.push_back(l_indices[j]);
+		}
+
+		auto whileTile = render::material::whiteTile();
+		md.materials.push_back(whileTile);
+
+		NodeData node0;
+		node0.meshes.push_back(0);
+		node0.tx = glm::mat4(1.0);
+		md.nodes.push_back(node0);
+
+		auto result = new Model(md);
+		result->SetScale(0.1f);
+		return result;
 	}
 }
 
@@ -221,6 +285,10 @@ namespace comp {
 		return *this;
 	}
 
+	const unsigned int& Model::GetVAO() const {
+		return VAO;
+	}
+
 	void Model::SetScale(const float scale_) {
 		this->scale = scale_;
 		this->calculateMatrix();
@@ -312,10 +380,10 @@ namespace comp {
 
 	Model ModelLoader::Floor() {
 		const glm::vec3 l_positions[] = {
-			glm::vec3(-10.0f, -0.1f, -10.0f),
-			glm::vec3(-10.0f, -0.1f, +10.0f),
-			glm::vec3(+10.0f, -0.1f, +10.0f),
-			glm::vec3(+10.0f, -0.1f, -10.0f),
+			glm::vec3(-10.0f, -0.001f, -10.0f),
+			glm::vec3(-10.0f, -0.001f, +10.0f),
+			glm::vec3(+10.0f, -0.001f, +10.0f),
+			glm::vec3(+10.0f, -0.001f, -10.0f),
 		};
 
 		const glm::vec3 l_normals[] = {
@@ -344,7 +412,106 @@ namespace comp {
 		const auto vCount = 4;
 		const auto iCount = 6;
 
-		MeshData mesh0;
+		MeshData mesh0{};
+		mesh0.materialIndex = 0;
+		mesh0.noOfIndices = iCount;
+		mesh0.baseVertex = 0;
+		mesh0.baseIndex = 0;
+		md.meshes.push_back(mesh0);
+
+		md.positions.reserve(vCount);
+		md.normals.reserve(vCount);
+		md.texCoords.reserve(vCount);
+		md.indices.reserve(iCount);
+
+		const aiVector3D Zero(0.0f, 0.0f, 0.0f);
+		for (unsigned int j = 0; j < vCount; j++) {
+			md.positions.push_back(l_positions[j]);
+			md.normals.push_back(l_normals[j]);
+			md.texCoords.push_back(l_texCoords[j]);
+		}
+		for (unsigned int j = 0; j < iCount; j++) {
+			md.indices.push_back(l_indices[j]);
+		}
+
+		md.materials.push_back(render::material::brickwall());
+
+		NodeData node0;
+		node0.meshes.push_back(0);
+		node0.tx = glm::mat4(1.0);
+		md.nodes.push_back(node0);
+
+		return Model(md);
+	}
+
+	Model ModelLoader::Wall(FACE face) {
+		glm::vec3 normal;
+		glm::vec3 p0, p1, p2, p3;
+		float x = 0;
+		float z = 0;
+		// half side
+		float distance = 10.0f;
+		switch (face)
+		{
+		case comp::ModelLoader::LEFT:
+			x = -distance;
+			normal = glm::vec3(-1, 0, 0);
+			p0 = { x, +distance, +distance}; p1 = { x, +distance,-distance }; p2 = {x,-distance,-distance }; p3 = {x,-distance,+distance };
+			break;
+		case comp::ModelLoader::RIGHT:
+			x = distance;
+			normal = glm::vec3(1, 0, 0);
+			p0 = { x, +distance, -distance }; p1 = { x, +distance,+distance }; p2 = { x,-distance,+distance }; p3 = { x,-distance,-distance };
+			break;
+		case comp::ModelLoader::FRONT:
+			z = distance;
+			normal = glm::vec3(0, +1, 0);
+			p0 = {+distance,+distance,z}; p1 = {-distance,+distance,z}; p2 = {-distance,-distance,z}; p3 = {+distance,-distance,z};
+			break;
+		case comp::ModelLoader::BACK:
+			z = -distance;
+			normal = glm::vec3(0, -1, 0);
+			p0 = { -distance,+distance,z }; p1 = { +distance,+distance,z }; p2 = { +distance,-distance,z }; p3 = { -distance,-distance,z };
+			break;
+		default:
+			assert(false && "invalid face enum");
+		}
+		const glm::vec3 l_positions[] = {
+			p0 + glm::vec3(0,distance,0),
+			p1 + glm::vec3(0,distance,0),
+			p2 + glm::vec3(0,distance,0),
+			p3 + glm::vec3(0,distance,0),
+		};
+
+		const glm::vec3 l_normals[] = {
+			normal,
+			normal,
+			normal,
+			normal,
+		};
+
+		const glm::vec2 l_texCoords[] = {
+			glm::vec2(0.0f,  0.0f),
+			glm::vec2(1.0f,  0.0f),
+			glm::vec2(1.0f,  1.0f),
+			glm::vec2(0.0f,  1.0f),
+		};
+
+		const unsigned int l_indices[] = {
+			0, 1, 2,
+			0, 2, 3,
+			0, 3, 2,
+			0, 2, 1,
+		};
+
+		ModelData md;
+		md.nodes.reserve(1);
+		md.meshes.reserve(1);
+
+		const auto vCount = 4;
+		const auto iCount = 12;
+
+		MeshData mesh0{};
 		mesh0.materialIndex = 0;
 		mesh0.noOfIndices = iCount;
 		mesh0.baseVertex = 0;
@@ -380,12 +547,15 @@ namespace comp {
 		comp::ModelData md;
 		std::string completeFilePath = directory + DELIMITER_STR + filepath;
 		Assimp::Importer importer;
+		LOG(INFO) << "Loading Model: " << completeFilePath << "\n";
 		const aiScene* scene = importer.ReadFile(completeFilePath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+		if (!scene) {
+			auto msg = std::string(importer.GetErrorString());
+			LOG(ERROR) << "Failed to load model: " << msg << "\n";
+			throw std::runtime_error("failed to load the file " + msg);
+		}
 		LOG(INFO) << "nodes of scene " << scene->mName.C_Str() << "\n";
 		printNode("", scene->mRootNode);
-		if (!scene) {
-			throw std::runtime_error("failed to load the file " + std::string(importer.GetErrorString()));
-		}
 
 		// RC = running count
 		unsigned int verticesRC = 0;

@@ -52,6 +52,24 @@
     <Filter Include="Resource Files\shaders\light_caster">
       <UniqueIdentifier>{f9ba805d-0de1-4567-ac03-9ae43e2ec20c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\physics">
+      <UniqueIdentifier>{0227477e-cb50-4fb7-87c5-8e7a8c8898cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{56fbe432-4655-4d2f-af8f-62af9696c1ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game">
+      <UniqueIdentifier>{1bf20280-0a21-4bfa-94fe-f3c67e7837e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game\actions">
+      <UniqueIdentifier>{ba0c5e89-973c-4bd1-bdb1-894be28e8aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\assets\porsche_911_930_turbo_1975">
+      <UniqueIdentifier>{88434ce8-a862-4af8-bab9-11daac29e0e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\assets\porsche_911_930_turbo_1975\textures">
+      <UniqueIdentifier>{045aed7e-3bed-4f8a-b156-8c5af0bd5c8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine.cpp">
@@ -114,6 +132,21 @@
     <ClCompile Include="src\_os_windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ManagedArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SparsedArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UnsafeAlloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game.h">
@@ -170,63 +203,117 @@
     <ClInclude Include="src\Scene.h">
       <Filter>Header Files\scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\physics\System.h">
+      <Filter>Header Files\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ManagedArray.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SparsedArray.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entities.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Action.h">
+      <Filter>Header Files\game\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UnsafeAlloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\simple.fs">
-      <Filter>Resource Files\shaders\simple</Filter>
-    </None>
-    <None Include="shaders\simple.vs">
-      <Filter>Resource Files\shaders\simple</Filter>
-    </None>
-    <None Include="shaders\camera.vs">
-      <Filter>Resource Files\shaders\camera</Filter>
-    </None>
-    <None Include="shaders\camera.fs">
-      <Filter>Resource Files\shaders\camera</Filter>
-    </None>
     <None Include="src\movements.enums">
       <Filter>Header Files\engine</Filter>
     </None>
     <None Include="src\actions.enums">
       <Filter>Header Files\engine</Filter>
     </None>
-    <None Include="shaders\light.vs">
-      <Filter>Resource Files\shaders\light</Filter>
-    </None>
-    <None Include="shaders\light.fs">
-      <Filter>Resource Files\shaders\light</Filter>
-    </None>
-    <None Include="shaders\light_source.fs">
-      <Filter>Resource Files\shaders\light</Filter>
-    </None>
-    <None Include="shaders\light_source.vs">
-      <Filter>Resource Files\shaders\light</Filter>
-    </None>
     <None Include="src\tex_types.enums">
       <Filter>Header Files\render</Filter>
-    </None>
-    <None Include="shaders\light_caster.fs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
-    </None>
-    <None Include="shaders\light_caster.vs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
-    </None>
-    <None Include="shaders\light_caster.src.fs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
-    </None>
-    <None Include="shaders\light_caster.src.vs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
-    </None>
-    <None Include="shaders\bold_color.fs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
-    </None>
-    <None Include="shaders\bold_color.vs">
-      <Filter>Resource Files\shaders\light_caster</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\lib\assimp-vc143-mt.dll">
       <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.003_baseColor.jpeg">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975\textures</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.010_baseColor.jpeg">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975\textures</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.010_normal.png">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975\textures</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.013_baseColor.png">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975\textures</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.013_normal.png">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975\textures</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\scene.gltf">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\brickwall.jpg">
+      <Filter>Resource Files\assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\brickwall_normal.jpg">
+      <Filter>Resource Files\assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tile.jpg">
+      <Filter>Resource Files\assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tile.png">
+      <Filter>Resource Files\assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tilen_ormal.png">
+      <Filter>Resource Files\assets</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\camera.fs">
+      <Filter>Resource Files\shaders\camera</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\camera.vs">
+      <Filter>Resource Files\shaders\camera</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light.fs">
+      <Filter>Resource Files\shaders\light</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light.vs">
+      <Filter>Resource Files\shaders\light</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_source.fs">
+      <Filter>Resource Files\shaders\light</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_source.vs">
+      <Filter>Resource Files\shaders\light</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\bold_color.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\bold_color.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.src.fs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.src.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.vs">
+      <Filter>Resource Files\shaders\light_caster</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\simple.fs">
+      <Filter>Resource Files\shaders\simple</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\simple.vs">
+      <Filter>Resource Files\shaders\simple</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\scene.bin">
+      <Filter>Resource Files\assets\porsche_911_930_turbo_1975</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

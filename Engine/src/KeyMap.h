@@ -4,32 +4,35 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
+
+#include <Action.h>
 
 namespace engine {
 
 	class Engine;
 	typedef int Key;
 
-	enum Action {
-#define X(a) a,
-#include "actions.enums"
-#undef X
-		ACTION_LAST,
-	};
-
-	std::ostream& operator<<(std::ostream& os, Action a);
-
-	Action actions[];
+//	enum Action {
+//#define X(a) a,
+//#include "actions.enums"
+//#undef X
+//		ACTION_LAST,
+//	};
+//
+//	std::ostream& operator<<(std::ostream& os, Action a);
 
 	class KeyMap {
 	private:
 		// keyToActionMapping
-		Action* kToA;
+		std::vector<void*> keyToAction;
 		// actionToKeyMapping
-		Key* aToK;
+		std::map<void*, Key> actionToKey;
 	public:
 		KeyMap();
-		bool SetIfNotPresent(Key key, Action a);
+		KeyMap(Engine&);
+		bool SetIfNotPresent(Key key, void*);
 		void ProcessInput(Engine& engine, GLFWwindow* window);
 	};
 }

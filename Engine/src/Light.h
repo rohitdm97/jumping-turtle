@@ -21,7 +21,8 @@ namespace render {
 	private:
 		glObject VAO, VBO, EBO;
 		float scale;
-		Type type;
+		int delay = 0;
+		Type type = POINT_LIGHT;
 		glm::mat4 rotation;
 		glm::vec3 position;
 		glm::mat4 matrixCached;
@@ -53,5 +54,6 @@ namespace render {
 		void Rotate(const glm::vec3& axis, float angleInRadians);
 
 		void Render(render::Shader& shader) const;
+		void ChangeLightType();
 	};
 }

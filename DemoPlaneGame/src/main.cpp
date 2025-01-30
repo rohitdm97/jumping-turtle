@@ -10,6 +10,8 @@
 #include <sstream>
 #include <map>
 
+#include "entities.h"
+
 namespace util {
 	namespace logging {
 		Level _global_level_ = DEBUG;

@@ -85,18 +85,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\DemoPlaneGame\src\main.cpp" />
+    <ClCompile Include="src\Action.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\debug.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\entities.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameLoop.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\KeyMap.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\ManagedArray.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\SparsedArray.cpp" />
+    <ClCompile Include="src\UnsafeAlloc.cpp" />
     <ClCompile Include="src\_os_windows.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -107,45 +112,159 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\stb_image.h" />
+    <ClInclude Include="src\Action.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\entities.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\GameLoop.h" />
     <ClInclude Include="src\KeyMap.h" />
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\ManagedArray.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\OS.h" />
+    <ClInclude Include="src\physics\System.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\SparsedArray.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\types.h" />
+    <ClInclude Include="src\UnsafeAlloc.h" />
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\lib\assimp-vc143-mt.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-    <None Include="shaders\bold_color.fs" />
-    <None Include="shaders\bold_color.vs" />
-    <None Include="shaders\camera.fs" />
-    <None Include="shaders\camera.vs" />
-    <None Include="shaders\light.fs" />
-    <None Include="shaders\light.vs" />
-    <None Include="shaders\light_caster.fs" />
-    <None Include="shaders\light_caster.src.fs" />
-    <None Include="shaders\light_caster.src.vs" />
-    <None Include="shaders\light_caster.vs" />
-    <None Include="shaders\light_source.fs" />
-    <None Include="shaders\light_source.vs" />
-    <None Include="shaders\simple.fs" />
-    <None Include="shaders\simple.vs" />
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\scene.gltf">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\bold_color.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\bold_color.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\camera.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\camera.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.src.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.src.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_caster.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_source.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\light_source.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\simple.fs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="shaders\simple.vs">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\shaders</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\shaders</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\scene.bin">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975</DestinationFolders>
+    </CopyFileToFolders>
     <None Include="src\actions.enums" />
     <None Include="src\movements.enums" />
     <None Include="src\tex_types.enums" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\brickwall.jpg">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\brickwall_normal.jpg">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.003_baseColor.jpeg">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.010_baseColor.jpeg">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.010_normal.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.013_baseColor.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\porsche_911_930_turbo_1975\textures\Material.013_normal.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets\porsche_911_930_turbo_1975\textures</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tile.jpg">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tile.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\DemoPlaneGame\assets\white_tilen_ormal.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\assets</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\assets</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

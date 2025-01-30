@@ -150,13 +150,13 @@ namespace render {
 
 	void Light::SetUniforms(std::string name, render::UniformStore store) const {
 		store.SetBool(name + ".enabled", true, true);
-		store.SetInt(name + ".type", Type::POINT_LIGHT);
+		store.SetInt(name + ".type", type);
 		store.SetVec3(name + ".position", position);
-		store.SetVec3(name + ".ambient", this->color);
-		store.SetVec3(name + ".diffuse", this->color);
+		store.SetVec3(name + ".ambient", 0.1f*this->color);
+		store.SetVec3(name + ".diffuse", 0.5f*this->color);
 		store.SetVec3(name + ".specular", this->color);
 
-		store.SetVec3(name + ".direction", glm::vec3(-0.7, -0.7, -0.2));
+		store.SetVec3(name + ".direction", glm::normalize(glm::vec3(-3, -7, 0)));
 
 		store.SetFloat(name + ".constant", 1.0f);
 		store.SetFloat(name + ".linear", 0.045f);
@@ -186,6 +186,29 @@ namespace render {
 		shader.Uniforms(true).SetMat4("Mesh", glm::mat4(1.0));
 		glDrawElements(GL_TRIANGLES, g_indices_count, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+	}
+
+	void Light::ChangeLightType() {
+		if (delay--) {
+			return;
+		}
+		delay = 10;
+		switch (type)
+		{
+		case render::Light::UNKNOWN:
+			break;
+		case render::Light::DIRECTION_LIGHT:
+			type = POINT_LIGHT;
+			break;
+		case render::Light::POINT_LIGHT:
+			type = SPOT_LIGHT;
+			break;
+		case render::Light::SPOT_LIGHT:
+			type = DIRECTION_LIGHT;
+			break;
+		default:
+			break;
+		}
 	}
 
 }

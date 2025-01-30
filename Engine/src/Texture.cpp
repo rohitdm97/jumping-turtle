@@ -23,6 +23,7 @@ namespace render {
         Texture t;
         unsigned char* data = stbi_load(filepath.c_str(), &t.width, &t.height, &t.nrChannels, 0);
         if (!data) {
+            std::cout << "failurre reason: " << stbi_failure_reason() << "\n";
             throw std::runtime_error("failed to load file " + filepath);
         }
         glGenTextures(1, &t.ID_);

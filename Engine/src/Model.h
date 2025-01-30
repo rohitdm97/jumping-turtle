@@ -83,6 +83,8 @@ namespace comp {
 		// move assignment
 		Model& operator=(Model&& o) noexcept;
 
+		const unsigned int& GetVAO() const;
+
 		void SetScale(const float);
 		void SetPosition(const glm::vec3& position);
 		void Rotate(glm::vec3 axis, float angleInRadians);
@@ -92,9 +94,14 @@ namespace comp {
 
 	class ModelLoader {
 	public:
+		enum FACE {
+			LEFT, RIGHT, FRONT, BACK
+		};
 		Model Floor();
+		Model Wall(FACE);
 		Model Load(std::string directory, std::string filepath);
 	};
 
 	Model createModel();
+	Model* CreateParticleSpawner();
 }
